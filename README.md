@@ -4,9 +4,13 @@
   the latest selected single-H200 Track A/B campaign, with model filters,
   a single configurable chart and paired tables. Select candidate history or
   final results, choose either axis, swap axes, and use linear/log scales.
-  Available metrics include time, candidate/lease counts, NLL, score, inference
-  cost and observed ANALYSIS improvement. Candidate and final-result metrics
-  remain in separate data views to avoid treating final TEST as interim feedback.
+  Both views expose Score, NLL, perplexity, inference latency, evaluation time
+  and throughput. Time, candidate/lease counts, improvements and Agent token
+  usage are also available where recorded. The default is Score versus time.
+  A cursor-following tooltip shows full metrics on hover near a point; touch
+  users can tap, and keyboard users can focus a point (Escape dismisses).
+  Candidate metrics come from their own postmortem ANALYSIS evaluations;
+  final metrics come from TEST. Perplexity is derived as exp(mean NLL).
 
 Only the latest selected H200 campaign is displayed. Older experiment pages
 have been removed from the published site. `/rsi/` is an alias of the homepage.

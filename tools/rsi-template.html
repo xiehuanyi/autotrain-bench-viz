@@ -13,6 +13,7 @@
 .chart-controls{display:grid;grid-template-columns:150px minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:end;margin:20px 0 12px}.chart-controls label{display:block;font-size:12px;color:var(--muted)}.chart-controls select{background:white;border:1px solid #d5d8e4;border-radius:7px;padding:8px 10px;color:var(--ink);font-size:13px;width:100%;min-width:0;margin-top:6px}.axis-inputs{display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:7px}.swap{height:39px;padding:0 12px;font-size:19px;color:var(--accent)}.plot-panel .chart{aspect-ratio:auto;height:440px;min-height:0}.point-detail{background:#f8f8fc;border:1px solid var(--line);border-radius:7px;padding:10px 13px;min-height:44px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.axis-note{font-size:12px;color:var(--muted);min-height:19px;margin-bottom:4px}.chart-point{cursor:pointer}.chart-point:hover{stroke:var(--ink);stroke-width:2.5px}
 @media(max-width:900px){.chart-controls{grid-template-columns:1fr 1fr;gap:12px}.chart-controls .view-field{grid-column:1/-1;max-width:220px}.swap{grid-column:1/-1;grid-row:3;justify-self:start;font-size:13px;height:31px}.swap::after{content:' 交换横纵轴'}}
 @media(max-width:560px){.chart-controls{grid-template-columns:1fr}.chart-controls .view-field{max-width:none}.swap{grid-row:auto}.plot-panel .chart{height:330px}}
+.plot-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.plot-presets button{color:var(--accent);background:#f5f3ff;border-color:#ddd8f4}.chart-point[data-active=true]{stroke:var(--ink);stroke-width:3px}.graph-tooltip{position:fixed;z-index:1000;width:340px;max-width:calc(100vw - 20px);padding:16px;background:rgba(255,255,255,.98);border:1px solid #ccc6e6;border-radius:11px;box-shadow:0 12px 38px #20233726;pointer-events:none;color:var(--ink);font-size:12px;line-height:1.45}.graph-tooltip[hidden]{display:none}.tooltip-title{font-size:15px;font-weight:700;margin-bottom:4px}.tooltip-subtitle{font-size:11px;color:var(--muted);margin-bottom:12px;overflow-wrap:anywhere}.tooltip-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 15px;margin:0}.tooltip-metrics dt{font-size:11px;color:var(--muted)}.tooltip-metrics dd{margin:2px 0 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}.tooltip-metrics .primary dd{font-size:20px;color:var(--accent)}.tooltip-footer{border-top:1px solid var(--line);padding-top:9px;margin-top:12px;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -23,9 +24,10 @@
 <div class="notice"><strong>如何解读：</strong>A 与 B 都允许自我改进，预算规则不同。这里展示观察结果，尚无同预算 RSI-off 对照。ANALYSIS 分数在研究结束后计算，并不是 Agent 当时获得的反馈。</div>
 <section class="panel" aria-labelledby="filter-title"><h2 id="filter-title">选择比较范围</h2><div class="filters"><div class="seg" aria-label="选择 Track"><button data-track="B" aria-pressed="true">Track B</button><button data-track="A" aria-pressed="false">Track A</button></div><span id="track-desc" class="hint"></span><span class="grow"></span><button id="all" class="smallbutton">全部模型</button><button id="leading" class="smallbutton">聚焦主要模型</button></div><div class="legend" id="legend" aria-label="筛选模型"></div><p class="caption">点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。</p></section>
 <section class="panel plot-panel" aria-labelledby="plot-title">
-<h2 id="plot-title">自定义比较图</h2><p class="hint">先选候选过程或最终结果，再自由选择横轴、纵轴。颜色与上方模型一致。</p>
+<h2 id="plot-title">自定义比较图</h2><p class="hint">横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。</p>
+<div class="plot-presets" aria-label="常用指标组合"><button type="button" class="smallbutton" data-preset="score-time">Score × 时间</button><button type="button" class="smallbutton" data-preset="nll-time">NLL × 时间</button><button type="button" class="smallbutton" data-preset="score-cost">Score × 推理耗时</button></div>
 <div class="chart-controls">
-<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选过程</option><option value="final">最终结果</option></select></label>
+<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选 · ANALYSIS</option><option value="final">最终 · TEST</option></select></label>
 <div><label for="x-metric">横轴</label><div class="axis-inputs"><select id="x-metric" aria-label="横轴指标"></select><select id="x-scale" aria-label="横轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
 <button id="swap-axes" class="smallbutton swap" aria-label="交换横纵轴" title="交换横纵轴">⇄</button>
 <div><label for="y-metric">纵轴</label><div class="axis-inputs"><select id="y-metric" aria-label="纵轴指标"></select><select id="y-scale" aria-label="纵轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
@@ -40,6 +42,7 @@
 <section class="panel"><h2>数据口径与复现</h2><ul class="note-list"><li>每个模型／Track 采用最新授权尝试。GLM B 与 Flash A 的旧失败尝试单独排除。</li><li>本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。</li><li>A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。</li><li>页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。</li></ul><details><summary>查看数据身份</summary><p id="provenance" style="overflow-wrap:anywhere;margin-top:12px"></p></details></section>
 <footer><span>AutoTrain · RSI as meta-learning</span><a href="https://github.com/xiehuanyi/autotrain-bench-viz/blob/main/tools/build_rsi.py">构建脚本</a><a href="https://github.com/xiehuanyi/autotrain-bench-viz/blob/main/tools/rsi-template.html">页面模板</a><a href="https://arxiv.org/abs/2303.11366">Reflexion</a><a href="https://arxiv.org/abs/2210.14215">Algorithm Distillation</a></footer>
 </main>
+<div id="graph-tooltip" class="graph-tooltip" role="tooltip" hidden></div>
 <script type="application/json" id="rsi-data">__RSI_DATA__</script>
 <script>
 'use strict';
@@ -57,26 +60,42 @@ $('#all').addEventListener('click',()=>{models.forEach(m=>visible.add(m));render
 $('#leading').addEventListener('click',()=>{visible.clear();models.filter(m=>['claude-fable-5-1','claude-opus-5','gpt-6-astra','kimi-k3','deepseek-v4-flash','glm-5.3','gpt-5.6-sol'].includes(m)).forEach(m=>visible.add(m));render()});
 const metricSets={
  trajectory:{
+  score:{label:'Score ↑',get:(r,p)=>p.score},
+  nll:{label:'NLL ↓',get:(r,p)=>p.nll},
+  ppl:{label:'困惑度 PPL ↓',get:(r,p)=>p.ppl},
+  ms:{label:'推理耗时 / ms per task ↓',get:(r,p)=>p.ms},
+  evaluation_seconds:{label:'评估总耗时 / s ↓',get:(r,p)=>p.evaluation_seconds},
+  tasks_per_second:{label:'推理吞吐 / tasks per s ↑',get:(r,p)=>p.tasks_per_second},
+  input_tokens_per_second:{label:'输入吞吐 / tokens per s ↑',get:(r,p)=>p.input_tokens_per_second},
   hours:{label:'累计租约时间 / h',get:(r,p)=>p.hours,ordered:true},
+  research_hours:{label:'提交时研究用时 / h',get:(r,p)=>p.research_hours,ordered:true},
   index:{label:'候选提交序号',get:(r,p)=>p.index,ordered:true,integer:true},
   lease:{label:'来源租约序号',get:(r,p)=>p.lease?Number(p.lease.split('-').pop()):null,ordered:true,integer:true},
-  nll:{label:'ANALYSIS NLL ↓',get:(r,p)=>p.nll},
+  score_gain:{label:'较首候选 Score 提升 ↑',get:(r,p)=>p.score==null||r.points[0]?.score==null?null:p.score-r.points[0].score},
   improvement:{label:'较首候选 NLL 下降 ↑',get:(r,p)=>r.first_analysis==null?null:r.first_analysis-p.nll}
  },
  final:{
-  ms:{label:'TEST 推理耗时 / ms ↓',get:r=>r.ms},
-  test_nll:{label:'TEST NLL ↓',get:r=>r.test_nll},
-  score:{label:'TEST Score ↑',get:r=>r.score},
+  score:{label:'Score ↑',get:r=>r.score},
+  nll:{label:'NLL ↓',get:r=>r.test_nll},
+  ppl:{label:'困惑度 PPL ↓',get:r=>r.ppl},
+  ms:{label:'推理耗时 / ms per task ↓',get:r=>r.ms},
+  evaluation_seconds:{label:'评估总耗时 / s ↓',get:r=>r.evaluation_seconds},
+  tasks_per_second:{label:'推理吞吐 / tasks per s ↑',get:r=>r.tasks_per_second},
+  input_tokens_per_second:{label:'输入吞吐 / tokens per s ↑',get:r=>r.input_tokens_per_second},
   lease_hours:{label:'总租约时间 / h',get:r=>r.lease_hours},
   research_hours:{label:'研究用时 / h',get:r=>r.research_hours},
   candidates:{label:'提交候选数',get:r=>r.candidates,integer:true},
   leases:{label:'使用租约数',get:r=>r.leases,integer:true},
+  reasoning_tokens:{label:'Agent 推理 tokens',get:r=>r.reasoning_tokens,integer:true},
+  output_tokens:{label:'Agent 输出 tokens',get:r=>r.output_tokens,integer:true},
+  total_tokens:{label:'Agent 总 tokens（含缓存）',get:r=>r.total_tokens,integer:true},
+  agent_turns:{label:'Agent 对话轮数',get:r=>r.agent_turns,integer:true},
   first_analysis:{label:'首候选 ANALYSIS NLL ↓',get:r=>r.first_analysis},
   final_analysis:{label:'最终候选 ANALYSIS NLL ↓',get:r=>r.final_analysis},
   improvement:{label:'首末 ANALYSIS NLL 下降 ↑',get:r=>r.first_analysis==null||r.final_analysis==null?null:r.first_analysis-r.final_analysis}
  }
 };
-const axisChoices={trajectory:{x:'hours',y:'nll',xs:'linear',ys:'linear'},final:{x:'ms',y:'test_nll',xs:'linear',ys:'linear'}};
+const axisChoices={trajectory:{x:'hours',y:'score',xs:'linear',ys:'linear'},final:{x:'ms',y:'score',xs:'linear',ys:'linear'}};
 function fillAxes(){
  const view=$('#plot-view').value,metrics=metricSets[view],choice=axisChoices[view];
  for(const axis of ['x','y']){
@@ -91,6 +110,66 @@ for(const id of ['x-metric','y-metric','x-scale','y-scale'])$('#'+id).addEventLi
 $('#swap-axes').addEventListener('click',()=>{
  const a=axisChoices[$('#plot-view').value];[a.x,a.y]=[a.y,a.x];[a.xs,a.ys]=[a.ys,a.xs];fillAxes();render();
 });
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
+ const view=$('#plot-view').value,a=axisChoices[view];
+ a.x=b.dataset.preset==='score-cost'?'ms':view==='trajectory'?'hours':'lease_hours';
+ a.y=b.dataset.preset==='nll-time'?'nll':'score';a.xs=a.ys='linear';fillAxes();render();
+}));
+let plottedPoints=[],activePoint=null,tooltipPinned=false;
+const tooltip=$('#graph-tooltip');
+const pretty=(v,d=3)=>v==null?'未记录':Number(v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+function hideTooltip(){
+ tooltip.hidden=true;tooltipPinned=false;
+ if(activePoint?.circle)activePoint.circle.removeAttribute('data-active');
+ activePoint=null;
+}
+function showTooltip(point,event){
+ const r=point.row,c=point.candidate,v=c||r,source=c?'ANALYSIS':'TEST';
+ if(activePoint!==point){
+  if(activePoint?.circle)activePoint.circle.removeAttribute('data-active');
+  activePoint=point;point.circle.setAttribute('data-active','true');
+  const entries=[
+   ['Score',pretty(v.score,4),'primary'],['NLL',pretty(c?c.nll:r.test_nll,6),'primary'],
+   ['困惑度 PPL',pretty(v.ppl,3)],['推理耗时 · ms/task',pretty(v.ms,4)],
+   ['评估总耗时 · s',pretty(v.evaluation_seconds,3)],['推理吞吐 · tasks/s',pretty(v.tasks_per_second,2)],
+   ['租约累计 · h',pretty(c?c.hours:r.lease_hours,3)],['研究用时 · h',pretty(v.research_hours,3)],
+  ];
+  if(c)entries.push(['较首候选 Score 提升',pretty(c.score-r.points[0].score,4)],['输入吞吐 · tokens/s',pretty(c.input_tokens_per_second,0)]);
+  else entries.push(['提交候选 / 使用租约',`${r.candidates} / ${r.leases}`],['Agent 推理 tokens',pretty(r.reasoning_tokens,0)]);
+  const stage=c?`候选 #${c.index} · ${c.lease}${c.final?' · 最终选定':''}`:'最终选定结果';
+  const budget=`${pretty(r.budget_hours,0)} h ${r.track==='A'?'研究墙钟上限':'租约总上限'}`;
+  const choice=axisChoices[$('#plot-view').value],set=metricSets[$('#plot-view').value];
+  const axes=`横轴 ${esc(set[choice.x].label)}：${pretty(point.x,set[choice.x].integer?0:6)}<br>纵轴 ${esc(set[choice.y].label)}：${pretty(point.y,set[choice.y].integer?0:6)}`;
+  tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${r.track}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>候选 ID ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>样本数 ${pretty(v.task_count,0)} · ${esc(budget)}<br>${c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。'}PPL = exp(NLL)。</div>`;
+  $('#point-detail').textContent=`${defs[r.model][0]} · Track ${r.track} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.ms,4)} ms/task`;
+ }
+ tooltip.hidden=false;
+ const anchor=point.circle.getBoundingClientRect(),x=event?.clientX??(anchor.left+anchor.width/2),y=event?.clientY??(anchor.top+anchor.height/2);
+ const rect=tooltip.getBoundingClientRect();
+ let left=x+18,top=y+16;
+ if(left+rect.width>innerWidth-10)left=x-rect.width-18;
+ if(top+rect.height>innerHeight-10)top=y-rect.height-16;
+ tooltip.style.left=Math.max(10,Math.min(left,innerWidth-rect.width-10))+'px';
+ tooltip.style.top=Math.max(10,Math.min(top,innerHeight-rect.height-10))+'px';
+}
+function nearestPoint(event){
+ const svg=$('#comparison-chart'),rect=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;
+ let nearest=null,distance=24;
+ for(const p of plottedPoints){
+  const x=rect.left+p.cx*rect.width/box.width,y=rect.top+p.cy*rect.height/box.height,d=Math.hypot(event.clientX-x,event.clientY-y);
+  if(d<distance){distance=d;nearest=p;}
+ }
+ return nearest;
+}
+$('#comparison-chart').addEventListener('pointermove',event=>{
+ if(event.pointerType==='touch')return;
+ tooltipPinned=false;const p=nearestPoint(event);p?showTooltip(p,event):hideTooltip();
+});
+$('#comparison-chart').addEventListener('pointerleave',()=>{if(!tooltipPinned)hideTooltip();});
+$('#comparison-chart').addEventListener('click',event=>{const p=nearestPoint(event);if(p){tooltipPinned=true;showTooltip(p,event);}else hideTooltip();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')hideTooltip();});
+document.addEventListener('pointerdown',event=>{if(!event.target.closest('#comparison-chart'))hideTooltip();});
+window.addEventListener('scroll',hideTooltip,{passive:true});
 const NS='http://www.w3.org/2000/svg';
 function el(parent,tag,attrs={},text){const n=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;parent.appendChild(n);return n}
 function axisDomain(values,log,integer){
@@ -105,6 +184,7 @@ function axisDomain(values,log,integer){
  return {ratio:v=>(transform(v)-low)/(high-low),ticks:ticks.map(v=>({fraction:(v-low)/(high-low),value:log?10**v:v}))};
 }
 function drawPlot(rows){
+ hideTooltip();plottedPoints=[];
  const view=$('#plot-view').value,choice=axisChoices[view],metrics=metricSets[view],xm=metrics[choice.x],ym=metrics[choice.y];
  const points=[];
  rows.forEach(r=>(view==='trajectory'?r.points:[null]).forEach(p=>{
@@ -120,8 +200,8 @@ function drawPlot(rows){
  $('#axis-note').textContent=notes.join('；');
  const trajectory=view==='trajectory',connected=trajectory&&(xm.ordered||ym.ordered);
  $('#plot-caption').textContent=trajectory?
-  `每个点是一份已提交候选。${connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'}租约时间包含测量、训练和打包；NLL 下降混合了继续训练、方法变化与修复收益。`:
-  '每个点是一个模型的最终结果。TEST 与 ANALYSIS 分属不同评估集；首末 ANALYSIS 下降是观察差值，不等于 RSI 的因果增益。';
+  `每个点是一份已提交候选，Score / NLL / 耗时均来自该候选的 ANALYSIS 评估。${connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'}租约时间包含测量、训练和打包。`:
+  '每个点是一个模型的最终 TEST 结果。Score / NLL / 耗时均来自 TEST；首末 ANALYSIS 下降单独标注。观察差值不等于 RSI 因果增益。';
  $('#point-detail').textContent='悬停、点击或键盘聚焦数据点，查看模型和精确数值。';
  const svg=$('#comparison-chart');svg.replaceChildren();
  const width=Math.max(300,svg.clientWidth),height=svg.clientHeight;
@@ -130,7 +210,7 @@ function drawPlot(rows){
  if(!points.length){el(svg,'text',{x:width/2,y:height/2,'text-anchor':'middle',fill:'#656c80','font-size':14},rows.length?'当前指标没有可用数据':'请选择至少一个模型');return;}
  const xlog=choice.xs==='log',ylog=choice.ys==='log',xd=axisDomain(points.map(p=>p.x),xlog,xm.integer),yd=axisDomain(points.map(p=>p.y),ylog,ym.integer);
  const left=64,right=width-23,top=20,bottom=height-62,sx=x=>left+xd.ratio(x)*(right-left),sy=y=>bottom-yd.ratio(y)*(bottom-top);
- const tick=(v,integer)=>integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
+ const tick=(v,integer)=>Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e4?(v/1e3).toFixed(1)+'k':integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
  yd.ticks.forEach(t=>{const y=bottom-t.fraction*(bottom-top);el(svg,'line',{x1:left,x2:right,y1:y,y2:y,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:y+4,'text-anchor':'end',fill:'#656c80','font-size':11},tick(t.value,ym.integer));});
  xd.ticks.forEach(t=>{const x=left+t.fraction*(right-left);el(svg,'line',{x1:x,x2:x,y1:top,y2:bottom,stroke:'#f0f1f6'});el(svg,'text',{x,y:bottom+22,'text-anchor':'middle',fill:'#656c80','font-size':11},tick(t.value,xm.integer));});
  el(svg,'line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#c8ccda'});
@@ -144,8 +224,10 @@ function drawPlot(rows){
   const r=p.row,stage=p.candidate?` · 提交 ${p.candidate.index}${p.candidate.final?' · 最终候选':''}`:' · 最终结果';
   const label=`${defs[r.model][0]} · Track ${r.track}${stage} ｜ ${xm.label}：${fmt(p.x,xm.integer?0:6)} ｜ ${ym.label}：${fmt(p.y,ym.integer?0:6)}`;
   const circle=el(svg,'circle',{cx:sx(p.x),cy:sy(p.y),r:!p.candidate||p.candidate.final?6:4.8,fill:defs[r.model][1],stroke:'white','stroke-width':1.5,tabindex:0,class:'chart-point','aria-label':label,'data-model-id':r.model,'data-x':p.x,'data-y':p.y});
-  el(circle,'title',{},label);
-  for(const event of ['pointerenter','focus','click'])circle.addEventListener(event,()=>{$('#point-detail').textContent=label;});
+  p.circle=circle;p.cx=sx(p.x);p.cy=sy(p.y);plottedPoints.push(p);
+  circle.setAttribute('aria-describedby','point-detail');
+  circle.addEventListener('focus',()=>showTooltip(p));
+  circle.addEventListener('blur',()=>{if(!tooltipPinned)hideTooltip();});
  });
 }
 function render(){

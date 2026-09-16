@@ -13,6 +13,7 @@
 .chart-controls{display:grid;grid-template-columns:150px minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:end;margin:20px 0 12px}.chart-controls label{display:block;font-size:12px;color:var(--muted)}.chart-controls select{background:white;border:1px solid #d5d8e4;border-radius:7px;padding:8px 10px;color:var(--ink);font-size:13px;width:100%;min-width:0;margin-top:6px}.axis-inputs{display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:7px}.swap{height:39px;padding:0 12px;font-size:19px;color:var(--accent)}.plot-panel .chart{aspect-ratio:auto;height:440px;min-height:0}.point-detail{background:#f8f8fc;border:1px solid var(--line);border-radius:7px;padding:10px 13px;min-height:44px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.axis-note{font-size:12px;color:var(--muted);min-height:19px;margin-bottom:4px}.chart-point{cursor:pointer}.chart-point:hover{stroke:var(--ink);stroke-width:2.5px}
 @media(max-width:900px){.chart-controls{grid-template-columns:1fr 1fr;gap:12px}.chart-controls .view-field{grid-column:1/-1;max-width:220px}.swap{grid-column:1/-1;grid-row:3;justify-self:start;font-size:13px;height:31px}.swap::after{content:' 交换横纵轴'}}
 @media(max-width:560px){.chart-controls{grid-template-columns:1fr}.chart-controls .view-field{max-width:none}.swap{grid-row:auto}.plot-panel .chart{height:330px}}
+.plot-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.plot-presets button{color:var(--accent);background:#f5f3ff;border-color:#ddd8f4}.chart-point[data-active=true]{stroke:var(--ink);stroke-width:3px}.graph-tooltip{position:fixed;z-index:1000;width:340px;max-width:calc(100vw - 20px);padding:16px;background:rgba(255,255,255,.98);border:1px solid #ccc6e6;border-radius:11px;box-shadow:0 12px 38px #20233726;pointer-events:none;color:var(--ink);font-size:12px;line-height:1.45}.graph-tooltip[hidden]{display:none}.tooltip-title{font-size:15px;font-weight:700;margin-bottom:4px}.tooltip-subtitle{font-size:11px;color:var(--muted);margin-bottom:12px;overflow-wrap:anywhere}.tooltip-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 15px;margin:0}.tooltip-metrics dt{font-size:11px;color:var(--muted)}.tooltip-metrics dd{margin:2px 0 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}.tooltip-metrics .primary dd{font-size:20px;color:var(--accent)}.tooltip-footer{border-top:1px solid var(--line);padding-top:9px;margin-top:12px;font-size:11px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -23,9 +24,10 @@
 <div class="notice"><strong>如何解读：</strong>A 与 B 都允许自我改进，预算规则不同。这里展示观察结果，尚无同预算 RSI-off 对照。ANALYSIS 分数在研究结束后计算，并不是 Agent 当时获得的反馈。</div>
 <section class="panel" aria-labelledby="filter-title"><h2 id="filter-title">选择比较范围</h2><div class="filters"><div class="seg" aria-label="选择 Track"><button data-track="B" aria-pressed="true">Track B</button><button data-track="A" aria-pressed="false">Track A</button></div><span id="track-desc" class="hint"></span><span class="grow"></span><button id="all" class="smallbutton">全部模型</button><button id="leading" class="smallbutton">聚焦主要模型</button></div><div class="legend" id="legend" aria-label="筛选模型"></div><p class="caption">点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。</p></section>
 <section class="panel plot-panel" aria-labelledby="plot-title">
-<h2 id="plot-title">自定义比较图</h2><p class="hint">先选候选过程或最终结果，再自由选择横轴、纵轴。颜色与上方模型一致。</p>
+<h2 id="plot-title">自定义比较图</h2><p class="hint">横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。</p>
+<div class="plot-presets" aria-label="常用指标组合"><button type="button" class="smallbutton" data-preset="score-time">Score × 时间</button><button type="button" class="smallbutton" data-preset="nll-time">NLL × 时间</button><button type="button" class="smallbutton" data-preset="score-cost">Score × 推理耗时</button></div>
 <div class="chart-controls">
-<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选过程</option><option value="final">最终结果</option></select></label>
+<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选 · ANALYSIS</option><option value="final">最终 · TEST</option></select></label>
 <div><label for="x-metric">横轴</label><div class="axis-inputs"><select id="x-metric" aria-label="横轴指标"></select><select id="x-scale" aria-label="横轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
 <button id="swap-axes" class="smallbutton swap" aria-label="交换横纵轴" title="交换横纵轴">⇄</button>
 <div><label for="y-metric">纵轴</label><div class="axis-inputs"><select id="y-metric" aria-label="纵轴指标"></select><select id="y-scale" aria-label="纵轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
@@ -40,8 +42,9 @@
 <section class="panel"><h2>数据口径与复现</h2><ul class="note-list"><li>每个模型／Track 采用最新授权尝试。GLM B 与 Flash A 的旧失败尝试单独排除。</li><li>本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。</li><li>A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。</li><li>页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。</li></ul><details><summary>查看数据身份</summary><p id="provenance" style="overflow-wrap:anywhere;margin-top:12px"></p></details></section>
 <footer><span>AutoTrain · RSI as meta-learning</span><a href="https://github.com/xiehuanyi/autotrain-bench-viz/blob/main/tools/build_rsi.py">构建脚本</a><a href="https://github.com/xiehuanyi/autotrain-bench-viz/blob/main/tools/rsi-template.html">页面模板</a><a href="https://arxiv.org/abs/2303.11366">Reflexion</a><a href="https://arxiv.org/abs/2210.14215">Algorithm Distillation</a></footer>
 </main>
+<div id="graph-tooltip" class="graph-tooltip" role="tooltip" hidden></div>
 <script type="application/json" id="rsi-data">{
-  "schema_version": 1,
+  "schema_version": 2,
   "generated_at": "2026-09-16T07:47:25+00:00",
   "source_sha256": "87acb7060b12878c170c8e7688fe673998af784b41207fedaa0b26e803e777b0",
   "core_revision": "7a044a156c37bc1febd823344d6e6c97ff083019",
@@ -70,6 +73,12 @@
       "test_nll": 6.359444763140411,
       "score": 41.25172744871658,
       "ms": 29.05222325921386,
+      "ppl": 577.9253818194371,
+      "evaluation_seconds": 59.49895323486999,
+      "tasks_per_second": 34.420773621270165,
+      "input_tokens_per_second": 23111.398188331586,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 2.8550688083333333,
       "research_hours": 2.904826594722222,
       "leases": 4,
@@ -80,19 +89,41 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "ae70e05d5695",
           "lease": "lease-0003",
           "hours": 1.9617612202777777,
+          "research_hours": 1.998434834722222,
           "nll": 20.7544659948457,
+          "score": 0.0,
+          "ppl": 1031691984.5218021,
+          "ms": 30.369924336355325,
+          "evaluation_seconds": 62.197605040855706,
+          "tasks_per_second": 32.927312854807376,
+          "input_tokens_per_second": 22108.632624949725,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "2873a9fb9349",
           "lease": "lease-0004",
           "hours": 2.855068808611111,
+          "research_hours": 2.8996348541666666,
           "nll": 6.462881619076471,
+          "score": 40.29618229804548,
+          "ppl": 640.9052429463804,
+          "ms": 29.43418453423874,
+          "evaluation_seconds": 60.28120992612094,
+          "tasks_per_second": 33.974102419476566,
+          "input_tokens_per_second": 22811.486393277297,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 1990,
+      "output_tokens": 5239,
+      "total_tokens": 1136848,
+      "agent_turns": 35
     },
     {
       "model": "gpt-5.6-terra",
@@ -102,6 +133,12 @@
       "test_nll": 3.788062542227833,
       "score": 65.00604392981427,
       "ms": 4.777960676392468,
+      "ppl": 44.17073837925039,
+      "evaluation_seconds": 9.785263465251774,
+      "tasks_per_second": 209.29431356371816,
+      "input_tokens_per_second": 140528.050663439,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 1.734797806388889,
       "research_hours": 1.7569193752777779,
       "leases": 2,
@@ -112,12 +149,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "a4d587405d46",
           "lease": "lease-0002",
           "hours": 1.7347978063888887,
+          "research_hours": 1.7513810866666666,
           "nll": 3.8266165565840007,
+          "score": 64.64988363159607,
+          "ppl": 45.90695160021351,
+          "ms": 4.775839541025562,
+          "evaluation_seconds": 9.78091938002035,
+          "tasks_per_second": 209.38726927690297,
+          "input_tokens_per_second": 140590.46461511054,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 2953,
+      "output_tokens": 6642,
+      "total_tokens": 788207,
+      "agent_turns": 23
     },
     {
       "model": "gpt-5.6-sol",
@@ -127,6 +177,12 @@
       "test_nll": 3.229495537606164,
       "score": 70.16606148604242,
       "ms": 5.981626528864581,
+      "ppl": 25.26690755076386,
+      "evaluation_seconds": 12.250371131114662,
+      "tasks_per_second": 167.17860855646194,
+      "input_tokens_per_second": 112249.98698262942,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 5.26856855,
       "research_hours": 5.3230718575000004,
       "leases": 6,
@@ -137,47 +193,105 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "7953524659af",
           "lease": "lease-0001",
           "hours": 0.7993058638888889,
+          "research_hours": 0.8137329155555556,
           "nll": 3.583498869310492,
+          "score": 66.89579419233638,
+          "ppl": 35.99927751800758,
+          "ms": 5.979985827707424,
+          "evaluation_seconds": 12.247010975144804,
+          "tasks_per_second": 167.22447658097124,
+          "input_tokens_per_second": 112280.78449433588,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "5405aed86354",
           "lease": "lease-0002",
           "hours": 1.6917726336111112,
+          "research_hours": 1.7130500522222223,
           "nll": 3.3930209645596427,
+          "score": 68.65542074466677,
+          "ppl": 29.755707566329168,
+          "ms": 5.829052737681195,
+          "evaluation_seconds": 11.937900006771088,
+          "tasks_per_second": 171.55446090504944,
+          "input_tokens_per_second": 115188.09834393414,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "93415ef352b3",
           "lease": "lease-0003",
           "hours": 2.5829608986111112,
+          "research_hours": 2.613718581111111,
           "nll": 3.331842280193082,
+          "score": 69.22058675480768,
+          "ppl": 27.98985939722665,
+          "ms": 6.031939562490152,
+          "evaluation_seconds": 12.35341222397983,
+          "tasks_per_second": 165.78415443989832,
+          "input_tokens_per_second": 111313.69819673922,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 4,
+          "candidate_id": "04b0ab94b00f",
           "lease": "lease-0004",
           "hours": 3.4768095316666665,
+          "research_hours": 3.5142922975,
           "nll": 3.2607105545192345,
+          "score": 69.87769852518602,
+          "ppl": 26.06805333646252,
+          "ms": 5.942903682580436,
+          "evaluation_seconds": 12.171066741924733,
+          "tasks_per_second": 168.26791302897163,
+          "input_tokens_per_second": 112981.38685439013,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 5,
+          "candidate_id": "55112fadcdb3",
           "lease": "lease-0005",
           "hours": 4.3694552275000005,
+          "research_hours": 4.413783918333333,
           "nll": 3.225357166697916,
+          "score": 70.20429157547495,
+          "ppl": 25.162559779427617,
+          "ms": 5.6687125386361,
+          "evaluation_seconds": 11.609523279126734,
+          "tasks_per_second": 176.40689895356755,
+          "input_tokens_per_second": 118446.20721613601,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 6,
+          "candidate_id": "a7cd0d287f5f",
           "lease": "lease-0006",
           "hours": 5.26856855,
+          "research_hours": 5.319707358888889,
           "nll": 3.2175719170956056,
+          "score": 70.27621137076387,
+          "ppl": 24.967423548644657,
+          "ms": 5.743525006892014,
+          "evaluation_seconds": 11.762739214114845,
+          "tasks_per_second": 174.109105262019,
+          "input_tokens_per_second": 116903.38236436687,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 2211,
+      "output_tokens": 8003,
+      "total_tokens": 1816774,
+      "agent_turns": 36
     },
     {
       "model": "claude-sonnet-5",
@@ -187,6 +301,12 @@
       "test_nll": 3.134502695392341,
       "score": 71.04360120729993,
       "ms": 5.241482888095561,
+      "ppl": 22.977206329716893,
+      "evaluation_seconds": 10.734556954819709,
+      "tasks_per_second": 190.78570346403242,
+      "input_tokens_per_second": 128100.67576963127,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 4.83820652888889,
       "research_hours": 4.871391920000001,
       "leases": 6,
@@ -197,12 +317,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "189e72fd1f91",
           "lease": "lease-0006",
           "hours": 4.83820652888889,
+          "research_hours": 4.8687079452777775,
           "nll": 3.185325654525792,
+          "score": 70.57410093388923,
+          "ppl": 24.17515987431068,
+          "ms": 5.480226780264275,
+          "evaluation_seconds": 11.223504445981234,
+          "tasks_per_second": 182.4742004475546,
+          "input_tokens_per_second": 122520.02096300494,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 28449,
+      "output_tokens": 30058,
+      "total_tokens": 7455210,
+      "agent_turns": 82
     },
     {
       "model": "claude-opus-5",
@@ -212,6 +345,12 @@
       "test_nll": 3.017565853133928,
       "score": 72.12385864110948,
       "ms": 5.750144274543345,
+      "ppl": 20.441473527710844,
+      "evaluation_seconds": 11.77629547426477,
+      "tasks_per_second": 173.9086798964564,
+      "input_tokens_per_second": 116768.80925797693,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 5.109524305000001,
       "research_hours": 5.145477649722222,
       "leases": 6,
@@ -222,19 +361,41 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "014f9376d0bc",
           "lease": "lease-0001",
           "hours": 0.831356956388889,
+          "research_hours": 0.8419814022222223,
           "nll": 3.5329726321582053,
+          "score": 67.36255336106412,
+          "ppl": 34.22555653669179,
+          "ms": 6.032888488789467,
+          "evaluation_seconds": 12.35535562504083,
+          "tasks_per_second": 165.75807788561588,
+          "input_tokens_per_second": 111296.18942032321,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "0b386f75efff",
           "lease": "lease-0006",
           "hours": 5.109524305000001,
+          "research_hours": 5.142945618888889,
           "nll": 3.0321317570884605,
+          "score": 71.9892994575096,
+          "ppl": 20.74140112323943,
+          "ms": 5.923672694962079,
+          "evaluation_seconds": 12.131681679282337,
+          "tasks_per_second": 168.81418867900527,
+          "input_tokens_per_second": 113348.1768111596,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 25644,
+      "output_tokens": 23382,
+      "total_tokens": 2067084,
+      "agent_turns": 43
     },
     {
       "model": "deepseek-v4-flash",
@@ -244,6 +405,12 @@
       "test_nll": 3.058128111567686,
       "score": 71.74914627194579,
       "ms": 5.485652499828575,
+      "ppl": 21.287671696702812,
+      "evaluation_seconds": 11.234616319648921,
+      "tasks_per_second": 182.29371985032768,
+      "input_tokens_per_second": 122398.8395220044,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 5.003047263333333,
       "research_hours": 5.0418284938888895,
       "leases": 6,
@@ -254,19 +421,41 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "d7417383bf9d",
           "lease": "lease-0005",
           "hours": 4.1915955205555555,
+          "research_hours": 4.2217354049999996,
           "nll": 3.2009684868958432,
+          "score": 70.42959313269309,
+          "ppl": 24.556301140192538,
+          "ms": 5.526260570377417,
+          "evaluation_seconds": 11.31778164813295,
+          "tasks_per_second": 180.9541890515135,
+          "input_tokens_per_second": 121499.42831127561,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "fce61eae7930",
           "lease": "lease-0006",
           "hours": 5.003047263333333,
+          "research_hours": 5.040023001111112,
           "nll": 3.0890940126996425,
+          "score": 71.46308463177866,
+          "ppl": 21.957176039030692,
+          "ms": 5.546785478827587,
+          "evaluation_seconds": 11.359816660638899,
+          "tasks_per_second": 180.2845997590965,
+          "input_tokens_per_second": 121049.84095074836,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 28123,
+      "output_tokens": 11401,
+      "total_tokens": 2020298,
+      "agent_turns": 43
     },
     {
       "model": "deepseek-v4-pro",
@@ -276,6 +465,12 @@
       "test_nll": 3.438659371901475,
       "score": 68.23381513392782,
       "ms": 5.9451668294059345,
+      "ppl": 31.14517606926735,
+      "evaluation_seconds": 12.175701666623354,
+      "tasks_per_second": 168.2038584777484,
+      "input_tokens_per_second": 112938.37822665319,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 3.984912792222222,
       "research_hours": 4.022744548888888,
       "leases": 6,
@@ -286,12 +481,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "650b36b6f3b5",
           "lease": "lease-0006",
           "hours": 3.9849127925,
+          "research_hours": 4.020548846111111,
           "nll": 3.470289980848834,
+          "score": 67.9416129520372,
+          "ppl": 32.1460628359082,
+          "ms": 5.8945008686350775,
+          "evaluation_seconds": 12.071937778964639,
+          "tasks_per_second": 169.649648424186,
+          "input_tokens_per_second": 113909.1358138144,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 41884,
+      "output_tokens": 13820,
+      "total_tokens": 4380272,
+      "agent_turns": 56
     },
     {
       "model": "kimi-k3",
@@ -301,6 +509,12 @@
       "test_nll": 3.0364002220492186,
       "score": 71.94986756491049,
       "ms": 6.242106470836006,
+      "ppl": 20.83012428832192,
+      "evaluation_seconds": 12.783834052272141,
+      "tasks_per_second": 160.20232988209025,
+      "input_tokens_per_second": 107565.85187020597,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 5.400805265833334,
       "research_hours": 5.473760193611111,
       "leases": 6,
@@ -311,47 +525,105 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "76a0957519e9",
           "lease": "lease-0001",
           "hours": 0.9188271577777778,
+          "research_hours": 0.9342546330555556,
           "nll": 3.590522183491794,
+          "score": 66.83091312313866,
+          "ppl": 36.25300170369986,
+          "ms": 5.802400994070922,
+          "evaluation_seconds": 11.883317235857248,
+          "tasks_per_second": 172.34244944839762,
+          "input_tokens_per_second": 115717.18340150848,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "8be987258612",
           "lease": "lease-0002",
           "hours": 1.8117128397222222,
+          "research_hours": 1.8397212983333333,
           "nll": 3.3754107811171576,
+          "score": 68.8181028490155,
+          "ppl": 29.236291031181658,
+          "ms": 5.873021916158905,
+          "evaluation_seconds": 12.027948884293437,
+          "tasks_per_second": 170.27009506785964,
+          "input_tokens_per_second": 114325.72695712601,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "ac492aba36ce",
           "lease": "lease-0003",
           "hours": 2.7028213188888888,
+          "research_hours": 2.738134278333333,
           "nll": 3.2545898160684796,
+          "score": 69.9342416392648,
+          "ppl": 25.908984904806573,
+          "ms": 5.93496662418147,
+          "evaluation_seconds": 12.154811646323651,
+          "tasks_per_second": 168.49294416005523,
+          "input_tokens_per_second": 113132.4811944671,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 4,
+          "candidate_id": "b0a9d6a539a4",
           "lease": "lease-0004",
           "hours": 3.597082975555556,
+          "research_hours": 3.642166097777778,
           "nll": 3.239617306231056,
+          "score": 70.07255703022534,
+          "ppl": 25.52395202066686,
+          "ms": 5.7030439024856605,
+          "evaluation_seconds": 11.679833912290633,
+          "tasks_per_second": 175.34495913036054,
+          "input_tokens_per_second": 117733.18099609145,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 5,
+          "candidate_id": "aa984785f644",
           "lease": "lease-0005",
           "hours": 4.493196662222222,
+          "research_hours": 4.549453894166667,
           "nll": 3.1756899543711703,
+          "score": 70.66311511043922,
+          "ppl": 23.943333978667702,
+          "ms": 5.767190767073771,
+          "evaluation_seconds": 11.811206690967083,
+          "tasks_per_second": 173.39464574489747,
+          "input_tokens_per_second": 116423.66745233959,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 6,
+          "candidate_id": "23230bf86298",
           "lease": "lease-0006",
           "hours": 5.400805265555555,
+          "research_hours": 5.468189479444444,
           "nll": 3.0649334698114874,
+          "score": 71.68627867016501,
+          "ppl": 21.433035995821218,
+          "ms": 5.752141458060578,
+          "evaluation_seconds": 11.780385706108063,
+          "tasks_per_second": 173.84829759335668,
+          "input_tokens_per_second": 116728.26631533944,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 33480,
+      "output_tokens": 20857,
+      "total_tokens": 4423432,
+      "agent_turns": 75
     },
     {
       "model": "glm-5.3",
@@ -361,6 +633,12 @@
       "test_nll": 3.149064944548225,
       "score": 70.90907578657011,
       "ms": 5.226121973691988,
+      "ppl": 23.314254265049836,
+      "evaluation_seconds": 10.703097802121192,
+      "tasks_per_second": 191.34647163498005,
+      "input_tokens_per_second": 128477.19654841191,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 5.093102945277778,
       "research_hours": 5.218912179722222,
       "leases": 6,
@@ -371,26 +649,57 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "ef0bc607eb74",
           "lease": "lease-0002",
           "hours": 1.6443182897222222,
+          "research_hours": 1.7366705208333333,
           "nll": 3.6054832246612007,
+          "score": 66.6927036792316,
+          "ppl": 36.799461969029565,
+          "ms": 5.314896788377155,
+          "evaluation_seconds": 10.884908622596413,
+          "tasks_per_second": 188.15040814844102,
+          "input_tokens_per_second": 126331.23967116886,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "b156d2b3c0e8",
           "lease": "lease-0005",
           "hours": 4.372751926388888,
+          "research_hours": 4.484669535,
           "nll": 3.309682952468253,
+          "score": 69.42529365505108,
+          "ppl": 27.376444461684923,
+          "ms": 5.348094431155914,
+          "evaluation_seconds": 10.952897395007312,
+          "tasks_per_second": 186.98248747710767,
+          "input_tokens_per_second": 125547.05393541048,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "34fad622ad6e",
           "lease": "lease-0006",
           "hours": 5.093102945277778,
+          "research_hours": 5.215570272222222,
           "nll": 3.2035448862840767,
+          "score": 70.40579246783972,
+          "ppl": 24.619649549787923,
+          "ms": 5.254499657667111,
+          "evaluation_seconds": 10.761215298902243,
+          "tasks_per_second": 190.31307739088888,
+          "input_tokens_per_second": 127783.33690064495,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 83364,
+      "output_tokens": 26546,
+      "total_tokens": 11579584,
+      "agent_turns": 104
     },
     {
       "model": "gpt-6-astra",
@@ -400,6 +709,12 @@
       "test_nll": 2.986191461153635,
       "score": 72.41369390186563,
       "ms": 4.962810632264336,
+      "ppl": 19.810091134988937,
+      "evaluation_seconds": 10.16383617487736,
+      "tasks_per_second": 201.49872201425086,
+      "input_tokens_per_second": 135293.79816244356,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 7.470907205277778,
       "research_hours": 7.487047124166667,
       "leases": 1,
@@ -410,12 +725,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "c9e9f7ced8a2",
           "lease": "lease-0001",
           "hours": 7.470907205277778,
+          "research_hours": 7.484534042500001,
           "nll": 3.0258160244890764,
+          "score": 72.04764391900414,
+          "ppl": 20.610816781966324,
+          "ms": 4.926358596208047,
+          "evaluation_seconds": 10.08918240503408,
+          "tasks_per_second": 202.98968913260342,
+          "input_tokens_per_second": 136294.8893969724,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 9192,
+      "output_tokens": 13970,
+      "total_tokens": 2798959,
+      "agent_turns": 51
     },
     {
       "model": "claude-fable-5-1",
@@ -425,6 +753,12 @@
       "test_nll": 2.88529248349031,
       "score": 73.34579424406338,
       "ms": 5.995534990688611,
+      "ppl": 17.90880485932868,
+      "evaluation_seconds": 12.278855660930276,
+      "tasks_per_second": 166.79078706955323,
+      "input_tokens_per_second": 111989.58909301314,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 7.517945586388889,
       "research_hours": 7.548542665,
       "leases": 2,
@@ -435,19 +769,41 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "9911c103cf1e",
           "lease": "lease-0001",
           "hours": 0.27873582305555555,
+          "research_hours": 0.28951273777777775,
           "nll": 7.771034468087212,
+          "score": 28.211523499237067,
+          "ppl": 2370.922664034981,
+          "ms": 4.5752031177244135,
+          "evaluation_seconds": 9.370015985099599,
+          "tasks_per_second": 218.56953107196122,
+          "input_tokens_per_second": 146755.77951912995,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "5cb9197ed179",
           "lease": "lease-0002",
           "hours": 7.517945586388889,
+          "research_hours": 7.544805519722222,
           "nll": 2.886063029217994,
+          "score": 73.33867597633574,
+          "ppl": 17.922609730360108,
+          "ms": 6.015095246652891,
+          "evaluation_seconds": 12.31891506514512,
+          "tasks_per_second": 166.24840654958066,
+          "input_tokens_per_second": 111625.41447263407,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 34494,
+      "output_tokens": 36430,
+      "total_tokens": 3172864,
+      "agent_turns": 58
     },
     {
       "model": "gpt-6-astra",
@@ -457,6 +813,12 @@
       "test_nll": 3.122259727831594,
       "score": 71.15670120610235,
       "ms": 4.683376078673973,
+      "ppl": 22.697612161512687,
+      "evaluation_seconds": 9.591554209124297,
+      "tasks_per_second": 213.52118283935354,
+      "input_tokens_per_second": 143366.12920269844,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 5.377279839444444,
       "research_hours": 5.423411071944444,
       "leases": 6,
@@ -467,47 +829,105 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "8bfebc39cb53",
           "lease": "lease-0001",
           "hours": 0.8256679230555556,
+          "research_hours": 0.8338855672222222,
           "nll": 4.375368536329834,
+          "score": 59.58053684584858,
+          "ppl": 79.46912141455611,
+          "ms": 5.301226430674433,
+          "evaluation_seconds": 10.856911730021238,
+          "tasks_per_second": 188.63559462650193,
+          "input_tokens_per_second": 126657.01206703189,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "542595e18d2a",
           "lease": "lease-0002",
           "hours": 1.7483966361111112,
+          "research_hours": 1.7647523052777778,
           "nll": 4.474357311632436,
+          "score": 58.66608286950438,
+          "ppl": 87.73819396915967,
+          "ms": 5.432205831993997,
+          "evaluation_seconds": 11.125157543923706,
+          "tasks_per_second": 184.0872807341563,
+          "input_tokens_per_second": 123603.10355794006,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "3a3376bfe030",
           "lease": "lease-0003",
           "hours": 2.676583027777778,
+          "research_hours": 2.6993877283333334,
           "nll": 4.164212934348758,
+          "score": 61.531183060721695,
+          "ppl": 64.34202111443108,
+          "ms": 5.2369748045748565,
+          "evaluation_seconds": 10.725324399769306,
+          "tasks_per_second": 190.94993528065697,
+          "input_tokens_per_second": 128210.94717000611,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 4,
+          "candidate_id": "076638b0d8be",
           "lease": "lease-0004",
           "hours": 3.5994437930555554,
+          "research_hours": 3.6293835225,
           "nll": 4.207483568490142,
+          "score": 61.13145083523892,
+          "ppl": 67.18725477737075,
+          "ms": 5.328661324710993,
+          "evaluation_seconds": 10.913098393008113,
+          "tasks_per_second": 187.66439431281296,
+          "input_tokens_per_second": 126004.91175640936,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 5,
+          "candidate_id": "cd58f7aab5d1",
           "lease": "lease-0005",
           "hours": 4.508453073055556,
+          "research_hours": 4.543657536111111,
           "nll": 3.254495762351258,
+          "score": 69.93511050339048,
+          "ppl": 25.90654818306,
+          "ms": 5.627136368502761,
+          "evaluation_seconds": 11.524375282693654,
+          "tasks_per_second": 177.7102836173268,
+          "input_tokens_per_second": 119321.34855630886,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 6,
+          "candidate_id": "11d2816595a9",
           "lease": "lease-0006",
           "hours": 5.3772798391666665,
+          "research_hours": 5.419334380833333,
           "nll": 3.1322024045527033,
+          "score": 71.06485119345871,
+          "ppl": 22.924412815973234,
+          "ms": 4.517626364759053,
+          "evaluation_seconds": 9.25209879502654,
+          "tasks_per_second": 221.35518063219354,
+          "input_tokens_per_second": 148626.16909572843,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 1159,
+      "output_tokens": 6702,
+      "total_tokens": 1601189,
+      "agent_turns": 40
     },
     {
       "model": "claude-fable-5-1",
@@ -517,6 +937,12 @@
       "test_nll": 3.017252226719791,
       "score": 72.12675590820486,
       "ms": 6.2553301547723095,
+      "ppl": 20.435063546890856,
+      "evaluation_seconds": 12.81091615697369,
+      "tasks_per_second": 159.86366430828292,
+      "input_tokens_per_second": 107338.45910399272,
+      "task_count": 2048,
+      "budget_hours": 6.0,
       "lease_hours": 4.779901470555556,
       "research_hours": 4.867967242777778,
       "leases": 6,
@@ -527,40 +953,89 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "cfc678d136a4",
           "lease": "lease-0002",
           "hours": 1.2716253341666668,
+          "research_hours": 1.3170873819444444,
           "nll": 3.3912709365136458,
+          "score": 68.67158742720714,
+          "ppl": 29.703679781878936,
+          "ms": 6.290217187370217,
+          "evaluation_seconds": 12.882364799734205,
+          "tasks_per_second": 158.97702260708027,
+          "input_tokens_per_second": 106743.13461674147,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "d4da811c8e3f",
           "lease": "lease-0003",
           "hours": 2.1475148619444444,
+          "research_hours": 2.2052149697222223,
           "nll": 3.2464250203171936,
+          "score": 70.00966766527613,
+          "ppl": 25.69830458621688,
+          "ms": 6.21913666736873,
+          "evaluation_seconds": 12.736791894771159,
+          "tasks_per_second": 160.79402230327455,
+          "input_tokens_per_second": 107963.13635025489,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "d307e8ec687b",
           "lease": "lease-0004",
           "hours": 3.0144274263888886,
+          "research_hours": 3.0820062908333337,
           "nll": 3.1696913272763023,
+          "score": 70.71853016515365,
+          "ppl": 23.800136769446166,
+          "ms": 6.248432998518183,
+          "evaluation_seconds": 12.796790780965239,
+          "tasks_per_second": 160.04012529815878,
+          "input_tokens_per_second": 107456.9416298825,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 4,
+          "candidate_id": "239fd4a7ba2d",
           "lease": "lease-0005",
           "hours": 3.883104146111111,
+          "research_hours": 3.958041688611111,
           "nll": 3.1374654593206923,
+          "score": 71.01623132372508,
+          "ppl": 23.045383314088596,
+          "ms": 6.218034558060026,
+          "evaluation_seconds": 12.734534774906933,
+          "tasks_per_second": 160.82252207874373,
+          "input_tokens_per_second": 107982.27216824649,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 5,
+          "candidate_id": "02ff3d0e5dbf",
           "lease": "lease-0006",
           "hours": 4.779901470555555,
+          "research_hours": 4.862615659166667,
           "nll": 3.044046764266998,
+          "score": 71.87922914237261,
+          "ppl": 20.990013232823408,
+          "ms": 6.155366227176273,
+          "evaluation_seconds": 12.606190033257008,
+          "tasks_per_second": 162.45987047609714,
+          "input_tokens_per_second": 109081.64928279446,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 27505,
+      "output_tokens": 52761,
+      "total_tokens": 20523440,
+      "agent_turns": 190
     },
     {
       "model": "kimi-k3",
@@ -570,6 +1045,12 @@
       "test_nll": 3.161392606646895,
       "score": 70.795193383331,
       "ms": 6.348233416929361,
+      "ppl": 23.60344336409984,
+      "evaluation_seconds": 13.001182037871331,
+      "tasks_per_second": 157.52413850020338,
+      "input_tokens_per_second": 105767.61374423032,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 7.371758672777778,
       "research_hours": 7.47693991,
       "leases": 4,
@@ -580,26 +1061,57 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "ca16706d3790",
           "lease": "lease-0002",
           "hours": 5.675278240277778,
+          "research_hours": 5.714804040555556,
           "nll": 3.2000519050285434,
+          "score": 70.43806047589068,
+          "ppl": 24.533803591836982,
+          "ms": 6.408895285176186,
+          "evaluation_seconds": 13.125417544040829,
+          "tasks_per_second": 156.0331313749198,
+          "input_tokens_per_second": 104766.49564754772,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "3452f193a0c4",
           "lease": "lease-0003",
           "hours": 7.366771342222223,
+          "research_hours": 7.435580319166666,
           "nll": 3.1733102544637486,
+          "score": 70.68509867409274,
+          "ppl": 23.88642377048062,
+          "ms": 6.442496038516765,
+          "evaluation_seconds": 13.194231886882335,
+          "tasks_per_second": 155.21934263078364,
+          "input_tokens_per_second": 104220.08736765679,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "1dcbf468c8cc",
           "lease": "lease-0004",
           "hours": 7.371758672777778,
+          "research_hours": 7.4716574994444445,
           "nll": 3.1733102544637486,
+          "score": 70.68509867409274,
+          "ppl": 23.88642377048062,
+          "ms": 6.529467514610587,
+          "evaluation_seconds": 13.372349469922483,
+          "tasks_per_second": 153.1518455007796,
+          "input_tokens_per_second": 102831.8922634297,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 57309,
+      "output_tokens": 27996,
+      "total_tokens": 6859755,
+      "agent_turns": 94
     },
     {
       "model": "glm-5.3",
@@ -609,6 +1121,12 @@
       "test_nll": 3.247955036400625,
       "score": 69.99553344362232,
       "ms": 6.678744517557789,
+      "ppl": 25.73765350011012,
+      "evaluation_seconds": 13.678068771958351,
+      "tasks_per_second": 149.7287397910033,
+      "input_tokens_per_second": 100533.49072342178,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 5.712417235833334,
       "research_hours": 5.945129551666667,
       "leases": 2,
@@ -619,12 +1137,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "854b869dfd03",
           "lease": "lease-0002",
           "hours": 5.712417235833334,
+          "research_hours": 5.940207638333334,
           "nll": 3.2834213768823868,
+          "score": 69.66789694159692,
+          "ppl": 26.666854157368842,
+          "ms": 6.7885132943956705,
+          "evaluation_seconds": 13.902875226922333,
+          "tasks_per_second": 147.30765878083506,
+          "input_tokens_per_second": 98907.88614265695,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 95105,
+      "output_tokens": 25630,
+      "total_tokens": 8064366,
+      "agent_turns": 74
     },
     {
       "model": "gpt-5.6-luna",
@@ -634,6 +1165,12 @@
       "test_nll": 3.7066179119344222,
       "score": 65.75842586196788,
       "ms": 11.390191824148133,
+      "ppl": 40.71586874584725,
+      "evaluation_seconds": 23.327112855855376,
+      "tasks_per_second": 87.79483396231473,
+      "input_tokens_per_second": 58948.74382857169,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 1.9637719319444444,
       "research_hours": 1.9801401305555555,
       "leases": 1,
@@ -644,12 +1181,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "f7e964c6a38c",
           "lease": "lease-0001",
           "hours": 1.9637719319444444,
+          "research_hours": 1.976775925277778,
           "nll": 3.793098750428555,
+          "score": 64.95951965874647,
+          "ppl": 44.39375251555291,
+          "ms": 11.47692753318097,
+          "evaluation_seconds": 23.504747587954625,
+          "tasks_per_second": 87.1313334608847,
+          "input_tokens_per_second": 58503.24471064278,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 1157,
+      "output_tokens": 4944,
+      "total_tokens": 951006,
+      "agent_turns": 21
     },
     {
       "model": "gpt-5.6-terra",
@@ -659,6 +1209,12 @@
       "test_nll": 3.64037417043656,
       "score": 66.37038264833541,
       "ms": 21.78464821781745,
+      "ppl": 38.10609223140406,
+      "evaluation_seconds": 44.614959550090134,
+      "tasks_per_second": 45.903885617125084,
+      "input_tokens_per_second": 30821.590199048424,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 7.567380592777778,
       "research_hours": 7.586737426666667,
       "leases": 2,
@@ -669,12 +1225,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "0888849521bc",
           "lease": "lease-0002",
           "hours": 7.567380592777778,
+          "research_hours": 7.580936770555555,
           "nll": 3.715562529614639,
+          "score": 65.67579587508756,
+          "ppl": 41.08169025306201,
+          "ms": 22.030572419453165,
+          "evaluation_seconds": 45.11861231504008,
+          "tasks_per_second": 45.391466956028445,
+          "input_tokens_per_second": 30477.53309428835,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 2629,
+      "output_tokens": 7189,
+      "total_tokens": 656265,
+      "agent_turns": 27
     },
     {
       "model": "gpt-5.6-sol",
@@ -684,6 +1253,12 @@
       "test_nll": 3.153931641503035,
       "score": 70.8641174529774,
       "ms": 5.515821313451852,
+      "ppl": 23.427994219739112,
+      "evaluation_seconds": 11.296402049949393,
+      "tasks_per_second": 181.29666339285214,
+      "input_tokens_per_second": 121729.37842683816,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 6.843067181388888,
       "research_hours": 6.8567462425,
       "leases": 1,
@@ -694,12 +1269,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "e5344a8a2605",
           "lease": "lease-0001",
           "hours": 6.843067181388888,
+          "research_hours": 6.854362885555555,
           "nll": 3.1705159381380508,
+          "score": 70.7109124460824,
+          "ppl": 23.81977071480709,
+          "ms": 5.449867834386168,
+          "evaluation_seconds": 11.161329324822873,
+          "tasks_per_second": 183.49068828613755,
+          "input_tokens_per_second": 123202.52901612349,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 2565,
+      "output_tokens": 6781,
+      "total_tokens": 891949,
+      "agent_turns": 22
     },
     {
       "model": "claude-sonnet-5",
@@ -709,6 +1297,12 @@
       "test_nll": 3.4941142968437533,
       "score": 67.72152496298354,
       "ms": 5.543276047319523,
+      "ppl": 32.92111669940808,
+      "evaluation_seconds": 11.352629344910383,
+      "tasks_per_second": 180.39873740070271,
+      "input_tokens_per_second": 121126.47724348433,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 6.537855405,
       "research_hours": 6.558599476944444,
       "leases": 2,
@@ -719,12 +1313,25 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "693aaf436cbd",
           "lease": "lease-0002",
           "hours": 6.5378554047222215,
+          "research_hours": 6.552582671666666,
           "nll": 3.551453179774088,
+          "score": 67.19183087055242,
+          "ppl": 34.86394427244461,
+          "ms": 5.645032651386828,
+          "evaluation_seconds": 11.561026870040223,
+          "tasks_per_second": 177.14689387214221,
+          "input_tokens_per_second": 118943.0675542765,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 47015,
+      "output_tokens": 30585,
+      "total_tokens": 7086043,
+      "agent_turns": 88
     },
     {
       "model": "claude-opus-5",
@@ -734,6 +1341,12 @@
       "test_nll": 2.916379053399159,
       "score": 73.05861787101352,
       "ms": 5.186905573623335,
+      "ppl": 18.474271851135924,
+      "evaluation_seconds": 10.62278261478059,
+      "tasks_per_second": 192.7931761636921,
+      "input_tokens_per_second": 129448.56822040901,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 6.791675280833333,
       "research_hours": 6.829935034999999,
       "leases": 2,
@@ -744,19 +1357,41 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "fdd09e18ef04",
           "lease": "lease-0001",
           "hours": 0.7064001594444445,
+          "research_hours": 0.7185653572222223,
           "nll": 4.661999963745717,
+          "score": 56.93264825702211,
+          "ppl": 105.84756189662814,
+          "ms": 5.142097363773246,
+          "evaluation_seconds": 10.531015401007608,
+          "tasks_per_second": 194.4731749042972,
+          "input_tokens_per_second": 130576.58237480406,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "d13371377c0e",
           "lease": "lease-0002",
           "hours": 6.791675280833333,
+          "research_hours": 6.826158202499999,
           "nll": 2.9361170224208113,
+          "score": 72.87627937655662,
+          "ppl": 18.842538922715907,
+          "ms": 4.996623987267412,
+          "evaluation_seconds": 10.23308592592366,
+          "tasks_per_second": 200.13513175060564,
+          "input_tokens_per_second": 134378.23252479726,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 67332,
+      "output_tokens": 62565,
+      "total_tokens": 9089014,
+      "agent_turns": 93
     },
     {
       "model": "deepseek-v4-pro",
@@ -766,6 +1401,12 @@
       "test_nll": 3.1074060893991597,
       "score": 71.29391846822321,
       "ms": 6.002029170872447,
+      "ppl": 22.362961579383267,
+      "evaluation_seconds": 12.292155741946772,
+      "tasks_per_second": 166.61031986531336,
+      "input_tokens_per_second": 111868.41664456634,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 7.57606954,
       "research_hours": 7.794683673055555,
       "leases": 8,
@@ -776,33 +1417,73 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "4496ac61c6b7",
           "lease": "lease-0004",
           "hours": 0.3996331513888889,
+          "research_hours": 0.5588556827777778,
           "nll": 10.836687763656013,
+          "score": 0.0,
+          "ppl": 50852.66268652917,
+          "ms": 3.965667229522296,
+          "evaluation_seconds": 8.121686486061662,
+          "tasks_per_second": 252.1643754058658,
+          "input_tokens_per_second": 169312.617811576,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "d2bd202f4559",
           "lease": "lease-0006",
           "hours": 3.447408520555556,
+          "research_hours": 3.6452925708333335,
           "nll": 3.4145236583375556,
+          "score": 68.45677980010296,
+          "ppl": 30.40246401758441,
+          "ms": 6.291344190003656,
+          "evaluation_seconds": 12.884672901127487,
+          "tasks_per_second": 158.94854419011193,
+          "input_tokens_per_second": 106724.01313964828,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "0c9f7d59f00e",
           "lease": "lease-0007",
           "hours": 6.7680912475,
+          "research_hours": 6.974888850555556,
           "nll": 3.1799817861989528,
+          "score": 70.62346735574462,
+          "ppl": 24.046315573268107,
+          "ms": 6.129045676289024,
+          "evaluation_seconds": 12.552285545039922,
+          "tasks_per_second": 163.15753753779717,
+          "input_tokens_per_second": 109550.0891105347,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 4,
+          "candidate_id": "eb50bfc4d90a",
           "lease": "lease-0008",
           "hours": 7.576069539722223,
+          "research_hours": 7.791797518055556,
           "nll": 3.191800861126631,
+          "score": 70.51428325854485,
+          "ppl": 24.332206936465926,
+          "ms": 6.12039860538971,
+          "evaluation_seconds": 12.534576343838125,
+          "tasks_per_second": 163.3880510853306,
+          "input_tokens_per_second": 109704.86455060665,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 268880,
+      "output_tokens": 29239,
+      "total_tokens": 39382351,
+      "agent_turns": 159
     },
     {
       "model": "deepseek-v4-flash",
@@ -812,6 +1493,12 @@
       "test_nll": 3.0783356460307036,
       "score": 71.562469952481,
       "ms": 5.576860892574587,
+      "ppl": 21.722218832285126,
+      "evaluation_seconds": 11.421411107992753,
+      "tasks_per_second": 179.3123442134747,
+      "input_tokens_per_second": 120397.03211783491,
+      "task_count": 2048,
+      "budget_hours": 8.0,
       "lease_hours": 7.683254876666666,
       "research_hours": 7.720291221388888,
       "leases": 5,
@@ -822,26 +1509,57 @@
       "points": [
         {
           "index": 1,
+          "candidate_id": "9a7170c7a785",
           "lease": "lease-0002",
           "hours": 6.160158230277777,
+          "research_hours": 6.172569628611111,
           "nll": 3.1922240685001784,
+          "score": 70.51037368733968,
+          "ppl": 24.342506685167187,
+          "ms": 5.620221803269487,
+          "evaluation_seconds": 11.51021425309591,
+          "tasks_per_second": 177.92892078000617,
+          "input_tokens_per_second": 119468.14974622539,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 2,
+          "candidate_id": "567c63cfc203",
           "lease": "lease-0003",
           "hours": 7.322455534166666,
+          "research_hours": 7.342337705833334,
           "nll": 3.104102615758474,
+          "score": 71.3244358132175,
+          "ppl": 22.289208013830294,
+          "ms": 5.4669981797133005,
+          "evaluation_seconds": 11.19641227205284,
+          "tasks_per_second": 182.915736776858,
+          "input_tokens_per_second": 122816.4850121116,
+          "task_count": 2048,
           "final": false
         },
         {
           "index": 3,
+          "candidate_id": "e8625f49cf3c",
           "lease": "lease-0004",
           "hours": 7.680716035833333,
+          "research_hours": 7.710738369166666,
           "nll": 3.0933389509519023,
+          "score": 71.42387007788355,
+          "ppl": 22.050581004406418,
+          "ms": 5.568542564446943,
+          "evaluation_seconds": 11.40437517198734,
+          "tasks_per_second": 179.58020225698286,
+          "input_tokens_per_second": 120576.88205292291,
+          "task_count": 2048,
           "final": true
         }
-      ]
+      ],
+      "reasoning_tokens": 50692,
+      "output_tokens": 18937,
+      "total_tokens": 5574220,
+      "agent_turns": 86
     }
   ]
 }</script>
@@ -861,26 +1579,42 @@ $('#all').addEventListener('click',()=>{models.forEach(m=>visible.add(m));render
 $('#leading').addEventListener('click',()=>{visible.clear();models.filter(m=>['claude-fable-5-1','claude-opus-5','gpt-6-astra','kimi-k3','deepseek-v4-flash','glm-5.3','gpt-5.6-sol'].includes(m)).forEach(m=>visible.add(m));render()});
 const metricSets={
  trajectory:{
+  score:{label:'Score ↑',get:(r,p)=>p.score},
+  nll:{label:'NLL ↓',get:(r,p)=>p.nll},
+  ppl:{label:'困惑度 PPL ↓',get:(r,p)=>p.ppl},
+  ms:{label:'推理耗时 / ms per task ↓',get:(r,p)=>p.ms},
+  evaluation_seconds:{label:'评估总耗时 / s ↓',get:(r,p)=>p.evaluation_seconds},
+  tasks_per_second:{label:'推理吞吐 / tasks per s ↑',get:(r,p)=>p.tasks_per_second},
+  input_tokens_per_second:{label:'输入吞吐 / tokens per s ↑',get:(r,p)=>p.input_tokens_per_second},
   hours:{label:'累计租约时间 / h',get:(r,p)=>p.hours,ordered:true},
+  research_hours:{label:'提交时研究用时 / h',get:(r,p)=>p.research_hours,ordered:true},
   index:{label:'候选提交序号',get:(r,p)=>p.index,ordered:true,integer:true},
   lease:{label:'来源租约序号',get:(r,p)=>p.lease?Number(p.lease.split('-').pop()):null,ordered:true,integer:true},
-  nll:{label:'ANALYSIS NLL ↓',get:(r,p)=>p.nll},
+  score_gain:{label:'较首候选 Score 提升 ↑',get:(r,p)=>p.score==null||r.points[0]?.score==null?null:p.score-r.points[0].score},
   improvement:{label:'较首候选 NLL 下降 ↑',get:(r,p)=>r.first_analysis==null?null:r.first_analysis-p.nll}
  },
  final:{
-  ms:{label:'TEST 推理耗时 / ms ↓',get:r=>r.ms},
-  test_nll:{label:'TEST NLL ↓',get:r=>r.test_nll},
-  score:{label:'TEST Score ↑',get:r=>r.score},
+  score:{label:'Score ↑',get:r=>r.score},
+  nll:{label:'NLL ↓',get:r=>r.test_nll},
+  ppl:{label:'困惑度 PPL ↓',get:r=>r.ppl},
+  ms:{label:'推理耗时 / ms per task ↓',get:r=>r.ms},
+  evaluation_seconds:{label:'评估总耗时 / s ↓',get:r=>r.evaluation_seconds},
+  tasks_per_second:{label:'推理吞吐 / tasks per s ↑',get:r=>r.tasks_per_second},
+  input_tokens_per_second:{label:'输入吞吐 / tokens per s ↑',get:r=>r.input_tokens_per_second},
   lease_hours:{label:'总租约时间 / h',get:r=>r.lease_hours},
   research_hours:{label:'研究用时 / h',get:r=>r.research_hours},
   candidates:{label:'提交候选数',get:r=>r.candidates,integer:true},
   leases:{label:'使用租约数',get:r=>r.leases,integer:true},
+  reasoning_tokens:{label:'Agent 推理 tokens',get:r=>r.reasoning_tokens,integer:true},
+  output_tokens:{label:'Agent 输出 tokens',get:r=>r.output_tokens,integer:true},
+  total_tokens:{label:'Agent 总 tokens（含缓存）',get:r=>r.total_tokens,integer:true},
+  agent_turns:{label:'Agent 对话轮数',get:r=>r.agent_turns,integer:true},
   first_analysis:{label:'首候选 ANALYSIS NLL ↓',get:r=>r.first_analysis},
   final_analysis:{label:'最终候选 ANALYSIS NLL ↓',get:r=>r.final_analysis},
   improvement:{label:'首末 ANALYSIS NLL 下降 ↑',get:r=>r.first_analysis==null||r.final_analysis==null?null:r.first_analysis-r.final_analysis}
  }
 };
-const axisChoices={trajectory:{x:'hours',y:'nll',xs:'linear',ys:'linear'},final:{x:'ms',y:'test_nll',xs:'linear',ys:'linear'}};
+const axisChoices={trajectory:{x:'hours',y:'score',xs:'linear',ys:'linear'},final:{x:'ms',y:'score',xs:'linear',ys:'linear'}};
 function fillAxes(){
  const view=$('#plot-view').value,metrics=metricSets[view],choice=axisChoices[view];
  for(const axis of ['x','y']){
@@ -895,6 +1629,66 @@ for(const id of ['x-metric','y-metric','x-scale','y-scale'])$('#'+id).addEventLi
 $('#swap-axes').addEventListener('click',()=>{
  const a=axisChoices[$('#plot-view').value];[a.x,a.y]=[a.y,a.x];[a.xs,a.ys]=[a.ys,a.xs];fillAxes();render();
 });
+document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
+ const view=$('#plot-view').value,a=axisChoices[view];
+ a.x=b.dataset.preset==='score-cost'?'ms':view==='trajectory'?'hours':'lease_hours';
+ a.y=b.dataset.preset==='nll-time'?'nll':'score';a.xs=a.ys='linear';fillAxes();render();
+}));
+let plottedPoints=[],activePoint=null,tooltipPinned=false;
+const tooltip=$('#graph-tooltip');
+const pretty=(v,d=3)=>v==null?'未记录':Number(v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+function hideTooltip(){
+ tooltip.hidden=true;tooltipPinned=false;
+ if(activePoint?.circle)activePoint.circle.removeAttribute('data-active');
+ activePoint=null;
+}
+function showTooltip(point,event){
+ const r=point.row,c=point.candidate,v=c||r,source=c?'ANALYSIS':'TEST';
+ if(activePoint!==point){
+  if(activePoint?.circle)activePoint.circle.removeAttribute('data-active');
+  activePoint=point;point.circle.setAttribute('data-active','true');
+  const entries=[
+   ['Score',pretty(v.score,4),'primary'],['NLL',pretty(c?c.nll:r.test_nll,6),'primary'],
+   ['困惑度 PPL',pretty(v.ppl,3)],['推理耗时 · ms/task',pretty(v.ms,4)],
+   ['评估总耗时 · s',pretty(v.evaluation_seconds,3)],['推理吞吐 · tasks/s',pretty(v.tasks_per_second,2)],
+   ['租约累计 · h',pretty(c?c.hours:r.lease_hours,3)],['研究用时 · h',pretty(v.research_hours,3)],
+  ];
+  if(c)entries.push(['较首候选 Score 提升',pretty(c.score-r.points[0].score,4)],['输入吞吐 · tokens/s',pretty(c.input_tokens_per_second,0)]);
+  else entries.push(['提交候选 / 使用租约',`${r.candidates} / ${r.leases}`],['Agent 推理 tokens',pretty(r.reasoning_tokens,0)]);
+  const stage=c?`候选 #${c.index} · ${c.lease}${c.final?' · 最终选定':''}`:'最终选定结果';
+  const budget=`${pretty(r.budget_hours,0)} h ${r.track==='A'?'研究墙钟上限':'租约总上限'}`;
+  const choice=axisChoices[$('#plot-view').value],set=metricSets[$('#plot-view').value];
+  const axes=`横轴 ${esc(set[choice.x].label)}：${pretty(point.x,set[choice.x].integer?0:6)}<br>纵轴 ${esc(set[choice.y].label)}：${pretty(point.y,set[choice.y].integer?0:6)}`;
+  tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${r.track}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>候选 ID ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>样本数 ${pretty(v.task_count,0)} · ${esc(budget)}<br>${c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。'}PPL = exp(NLL)。</div>`;
+  $('#point-detail').textContent=`${defs[r.model][0]} · Track ${r.track} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.ms,4)} ms/task`;
+ }
+ tooltip.hidden=false;
+ const anchor=point.circle.getBoundingClientRect(),x=event?.clientX??(anchor.left+anchor.width/2),y=event?.clientY??(anchor.top+anchor.height/2);
+ const rect=tooltip.getBoundingClientRect();
+ let left=x+18,top=y+16;
+ if(left+rect.width>innerWidth-10)left=x-rect.width-18;
+ if(top+rect.height>innerHeight-10)top=y-rect.height-16;
+ tooltip.style.left=Math.max(10,Math.min(left,innerWidth-rect.width-10))+'px';
+ tooltip.style.top=Math.max(10,Math.min(top,innerHeight-rect.height-10))+'px';
+}
+function nearestPoint(event){
+ const svg=$('#comparison-chart'),rect=svg.getBoundingClientRect(),box=svg.viewBox.baseVal;
+ let nearest=null,distance=24;
+ for(const p of plottedPoints){
+  const x=rect.left+p.cx*rect.width/box.width,y=rect.top+p.cy*rect.height/box.height,d=Math.hypot(event.clientX-x,event.clientY-y);
+  if(d<distance){distance=d;nearest=p;}
+ }
+ return nearest;
+}
+$('#comparison-chart').addEventListener('pointermove',event=>{
+ if(event.pointerType==='touch')return;
+ tooltipPinned=false;const p=nearestPoint(event);p?showTooltip(p,event):hideTooltip();
+});
+$('#comparison-chart').addEventListener('pointerleave',()=>{if(!tooltipPinned)hideTooltip();});
+$('#comparison-chart').addEventListener('click',event=>{const p=nearestPoint(event);if(p){tooltipPinned=true;showTooltip(p,event);}else hideTooltip();});
+document.addEventListener('keydown',event=>{if(event.key==='Escape')hideTooltip();});
+document.addEventListener('pointerdown',event=>{if(!event.target.closest('#comparison-chart'))hideTooltip();});
+window.addEventListener('scroll',hideTooltip,{passive:true});
 const NS='http://www.w3.org/2000/svg';
 function el(parent,tag,attrs={},text){const n=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;parent.appendChild(n);return n}
 function axisDomain(values,log,integer){
@@ -909,6 +1703,7 @@ function axisDomain(values,log,integer){
  return {ratio:v=>(transform(v)-low)/(high-low),ticks:ticks.map(v=>({fraction:(v-low)/(high-low),value:log?10**v:v}))};
 }
 function drawPlot(rows){
+ hideTooltip();plottedPoints=[];
  const view=$('#plot-view').value,choice=axisChoices[view],metrics=metricSets[view],xm=metrics[choice.x],ym=metrics[choice.y];
  const points=[];
  rows.forEach(r=>(view==='trajectory'?r.points:[null]).forEach(p=>{
@@ -924,8 +1719,8 @@ function drawPlot(rows){
  $('#axis-note').textContent=notes.join('；');
  const trajectory=view==='trajectory',connected=trajectory&&(xm.ordered||ym.ordered);
  $('#plot-caption').textContent=trajectory?
-  `每个点是一份已提交候选。${connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'}租约时间包含测量、训练和打包；NLL 下降混合了继续训练、方法变化与修复收益。`:
-  '每个点是一个模型的最终结果。TEST 与 ANALYSIS 分属不同评估集；首末 ANALYSIS 下降是观察差值，不等于 RSI 的因果增益。';
+  `每个点是一份已提交候选，Score / NLL / 耗时均来自该候选的 ANALYSIS 评估。${connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'}租约时间包含测量、训练和打包。`:
+  '每个点是一个模型的最终 TEST 结果。Score / NLL / 耗时均来自 TEST；首末 ANALYSIS 下降单独标注。观察差值不等于 RSI 因果增益。';
  $('#point-detail').textContent='悬停、点击或键盘聚焦数据点，查看模型和精确数值。';
  const svg=$('#comparison-chart');svg.replaceChildren();
  const width=Math.max(300,svg.clientWidth),height=svg.clientHeight;
@@ -934,7 +1729,7 @@ function drawPlot(rows){
  if(!points.length){el(svg,'text',{x:width/2,y:height/2,'text-anchor':'middle',fill:'#656c80','font-size':14},rows.length?'当前指标没有可用数据':'请选择至少一个模型');return;}
  const xlog=choice.xs==='log',ylog=choice.ys==='log',xd=axisDomain(points.map(p=>p.x),xlog,xm.integer),yd=axisDomain(points.map(p=>p.y),ylog,ym.integer);
  const left=64,right=width-23,top=20,bottom=height-62,sx=x=>left+xd.ratio(x)*(right-left),sy=y=>bottom-yd.ratio(y)*(bottom-top);
- const tick=(v,integer)=>integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
+ const tick=(v,integer)=>Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e4?(v/1e3).toFixed(1)+'k':integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
  yd.ticks.forEach(t=>{const y=bottom-t.fraction*(bottom-top);el(svg,'line',{x1:left,x2:right,y1:y,y2:y,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:y+4,'text-anchor':'end',fill:'#656c80','font-size':11},tick(t.value,ym.integer));});
  xd.ticks.forEach(t=>{const x=left+t.fraction*(right-left);el(svg,'line',{x1:x,x2:x,y1:top,y2:bottom,stroke:'#f0f1f6'});el(svg,'text',{x,y:bottom+22,'text-anchor':'middle',fill:'#656c80','font-size':11},tick(t.value,xm.integer));});
  el(svg,'line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#c8ccda'});
@@ -948,8 +1743,10 @@ function drawPlot(rows){
   const r=p.row,stage=p.candidate?` · 提交 ${p.candidate.index}${p.candidate.final?' · 最终候选':''}`:' · 最终结果';
   const label=`${defs[r.model][0]} · Track ${r.track}${stage} ｜ ${xm.label}：${fmt(p.x,xm.integer?0:6)} ｜ ${ym.label}：${fmt(p.y,ym.integer?0:6)}`;
   const circle=el(svg,'circle',{cx:sx(p.x),cy:sy(p.y),r:!p.candidate||p.candidate.final?6:4.8,fill:defs[r.model][1],stroke:'white','stroke-width':1.5,tabindex:0,class:'chart-point','aria-label':label,'data-model-id':r.model,'data-x':p.x,'data-y':p.y});
-  el(circle,'title',{},label);
-  for(const event of ['pointerenter','focus','click'])circle.addEventListener(event,()=>{$('#point-detail').textContent=label;});
+  p.circle=circle;p.cx=sx(p.x);p.cy=sy(p.y);plottedPoints.push(p);
+  circle.setAttribute('aria-describedby','point-detail');
+  circle.addEventListener('focus',()=>showTooltip(p));
+  circle.addEventListener('blur',()=>{if(!tooltipPinned)hideTooltip();});
  });
 }
 function render(){

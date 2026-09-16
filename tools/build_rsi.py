@@ -12,6 +12,7 @@ Raw transcripts, commands, workspaces and filesystem paths are not published.
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +35,8 @@ def export(snapshot):
     rows = []
     for e in episodes:
         candidates = {c['id']: c for c in e['candidates']}
+        evaluations = {v['candidate_id']: v for v in e['events']
+                       if v['type'] == 'ANALYSIS_EVALUATED'}
         ended = {v['lease_id']: v for v in e['events'] if v['type'] == 'LEASE_ENDED'}
         commits = sorted([v for v in e['events'] if v['type'] == 'CANDIDATE_COMMITTED'],
                          key=lambda v: v['commit_index'])
@@ -43,27 +46,54 @@ def export(snapshot):
             if candidate.get('val_nll') is None:
                 continue
             elapsed = event['elapsed_seconds']
+            cost = evaluations.get(candidate['id'], {}).get('cost') or {}
+            per_task = cost.get('time_per_task')
             points.append({
                 'index': event['commit_index'],
+                'candidate_id': candidate['id'].removeprefix('sha256:')[:12],
                 'lease': event.get('lease_id', candidate.get('source_lease')),
                 'hours': sum(v['used_seconds'] for v in ended.values() if v['elapsed_seconds'] <= elapsed) / 3600,
+                'research_hours': elapsed / 3600,
                 'nll': candidate['val_nll'],
+                'score': candidate.get('analysis_score'),
+                'ppl': math.exp(candidate['val_nll']),
+                'ms': None if per_task is None else 1000 * per_task,
+                'evaluation_seconds': cost.get('candidate_wall_seconds'),
+                'tasks_per_second': cost.get('tasks_per_second'),
+                'input_tokens_per_second': cost.get('input_tokens_per_second'),
+                'task_count': cost.get('task_count'),
                 'final': candidate['id'] == e.get('final_candidate_id'),
             })
         ms = e.get('test_time_per_task')
+        test_event = next((v for v in e['events'] if v['type'] == 'TEST_EVALUATED'), {})
+        test_cost = test_event.get('cost') or {}
+        budget = e.get('budget') or {}
+        budget_seconds = budget.get('total_seconds')
+        if budget_seconds is None and budget.get('max_leases') and budget.get('lease_seconds'):
+            budget_seconds = budget['max_leases'] * budget['lease_seconds']
         rows.append({
             'model': e['model_short'], 'track': e['track'],
             'status': e['status'], 'outcome': e.get('outcome'),
             'test_nll': e.get('test_nll'), 'score': e.get('test_score'),
             'ms': None if ms is None else 1000 * ms,
+            'ppl': None if e.get('test_nll') is None else math.exp(e['test_nll']),
+            'evaluation_seconds': test_cost.get('candidate_wall_seconds'),
+            'tasks_per_second': test_cost.get('tasks_per_second'),
+            'input_tokens_per_second': test_cost.get('input_tokens_per_second'),
+            'task_count': test_cost.get('task_count'),
+            'budget_hours': None if budget_seconds is None else budget_seconds / 3600,
             'lease_hours': e['timing'].get('training_lease_seconds', 0) / 3600,
             'research_hours': e['timing'].get('official_elapsed_seconds', 0) / 3600,
             'leases': e['leases_used'], 'candidates': len(candidates),
             'first_analysis': e.get('first_val'), 'final_analysis': e.get('final_val'),
             'reasoning_effort': e.get('reasoning_effort'), 'points': points,
+            'reasoning_tokens': (e.get('tokens') or {}).get('reasoning'),
+            'output_tokens': (e.get('tokens') or {}).get('output'),
+            'total_tokens': (e.get('tokens') or {}).get('total'),
+            'agent_turns': (e.get('transcript_summary') or {}).get('turns'),
         })
     return {
-        'schema_version': 1, 'generated_at': source['generated_at'],
+        'schema_version': 2, 'generated_at': source['generated_at'],
         'source_sha256': hashlib.sha256(raw).hexdigest(),
         'core_revision': complete[0]['repo_commit'] if complete else None,
         'runtime': '1 × NVIDIA H200 SXM 141GB', 'task': 'lm-pretrain',
