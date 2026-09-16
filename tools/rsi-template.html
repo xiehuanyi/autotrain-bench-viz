@@ -130,7 +130,7 @@ const metricSets={
   improvement:{label:'首末 ANALYSIS NLL 下降 ↑',get:r=>r.first_analysis==null||r.final_analysis==null?null:r.first_analysis-r.final_analysis}
  }
 };
-const axisChoices={trajectory:{x:'hours',y:'score',xs:'linear',ys:'linear'},final:{x:'seconds_per_task',y:'score',xs:'linear',ys:'linear'}};
+const axisChoices={trajectory:{x:'seconds_per_task',y:'score',xs:'linear',ys:'linear'},final:{x:'seconds_per_task',y:'score',xs:'linear',ys:'linear'}};
 function fillAxes(){
  const view=$('#plot-view').value,metrics=metricSets[view],choice=axisChoices[view];
  for(const axis of ['x','y']){

@@ -6,7 +6,8 @@
   final results, choose either axis, swap axes, and use linear/log scales.
   Both views expose Score, NLL, perplexity, inference latency, evaluation time
   and throughput. Time, candidate/lease counts, improvements and Agent token
-  usage are also available where recorded. The default is Score versus time.
+  usage are also available where recorded. Both views default to Score versus
+  seconds per task (s/task).
   A cursor-following tooltip shows full metrics on hover near a point; touch
   users can tap, and keyboard users can focus a point (Escape dismisses).
   Candidate metrics come from their own postmortem ANALYSIS evaluations;
