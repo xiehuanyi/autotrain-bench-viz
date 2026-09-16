@@ -2,7 +2,11 @@
 
 - [RSI / meta-learning dashboard](https://xiehuanyi.github.io/autotrain-bench-viz/):
   the latest selected single-H200 Track A/B campaign, with model filters,
-  postmortem candidate trajectories, TEST quality/cost plots, and paired tables.
+  a single configurable chart and paired tables. Select candidate history or
+  final results, choose either axis, swap axes, and use linear/log scales.
+  Available metrics include time, candidate/lease counts, NLL, score, inference
+  cost and observed ANALYSIS improvement. Candidate and final-result metrics
+  remain in separate data views to avoid treating final TEST as interim feedback.
 
 Only the latest selected H200 campaign is displayed. Older experiment pages
 have been removed from the published site. `/rsi/` is an alias of the homepage.

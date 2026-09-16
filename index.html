@@ -10,6 +10,9 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans CJK SC",sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}button,select{font:inherit}button,a,select{touch-action:manipulation}button{cursor:pointer}button:focus-visible,a:focus-visible,select:focus-visible{outline:3px solid #aa9cf5;outline-offset:3px}header{background:var(--paper);border-bottom:1px solid var(--line)}.nav{max-width:1300px;margin:auto;padding:18px 30px;display:flex;align-items:center;gap:24px}.brand{font-weight:750;letter-spacing:-.5px;color:var(--ink)}.nav a{font-size:13px}.nav .active{background:var(--soft);padding:5px 12px;border-radius:7px}.grow{flex:1}.wrap{max-width:1300px;margin:auto;padding:35px 30px 50px}.eyebrow{font-size:11px;letter-spacing:1.6px;font-weight:750;color:var(--accent);text-transform:uppercase}h1{font-size:36px;line-height:1.3;letter-spacing:-1.2px;margin:10px 0}h2{font-size:18px;line-height:1.4;margin:0 0 7px}h3{font-size:15px;margin:0 0 8px}p{margin:0 0 12px}.muted{color:var(--muted)}.intro{max-width:930px}.stamp{font-size:12px;color:var(--muted);margin-top:15px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin:26px 0}.stat,.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px}.stat{padding:17px 20px}.stat .value{font-size:25px;line-height:1.3;letter-spacing:-.5px;font-weight:700}.stat .label{font-size:12px;color:var(--muted);margin-top:4px}.notice{background:#f0edff;border-left:3px solid #8776d6;padding:13px 17px;font-size:13px;border-radius:0 8px 8px 0;margin-bottom:22px}.panel{padding:23px;margin-bottom:20px;min-width:0}.filters{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:16px 0}.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;padding:3px;background:#f7f7fa}.seg button{border:0;background:transparent;color:var(--muted);padding:6px 17px;border-radius:5px;font-size:13px}.seg button[aria-pressed=true]{background:var(--accent);color:#fff}.smallbutton{border:1px solid var(--line);background:white;border-radius:6px;font-size:12px;color:var(--muted);padding:5px 10px}.legend{display:flex;flex-wrap:wrap;gap:7px;margin-top:15px}.chip{border:1px solid var(--line);background:white;border-radius:30px;padding:5px 11px;color:var(--ink);font-size:12px;display:flex;gap:7px;align-items:center}.chip[aria-pressed=false]{opacity:.42;background:#f5f5f8}.dot{width:9px;height:9px;border-radius:50%;flex:none}.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.grid .panel{margin:0}.charts{margin-bottom:20px}.chart{width:100%;aspect-ratio:1.55;min-height:230px;display:block;overflow:visible}.chart text{font-family:inherit}.caption{font-size:12px;color:var(--muted);margin-top:10px}.chartheading{display:flex;justify-content:space-between;gap:10px;align-items:start}.chartheading select{max-width:170px;background:white;border:1px solid var(--line);border-radius:6px;padding:5px 7px;font-size:12px}.tablewrap{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:13px}th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th{color:var(--muted);font-weight:500;font-size:12px;background:#fafafd}th:first-child,td:first-child{text-align:left}tbody tr:hover{background:#f8f7ff}.num{font-variant-numeric:tabular-nums}.badge{display:inline-block;padding:1px 6px;border-radius:4px;font-size:11px;background:var(--soft);color:var(--accent);margin-left:8px}.evidence{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:18px}.evidence p{font-size:13px;color:var(--muted)}.evidence .tag{font-size:11px;letter-spacing:.8px;color:var(--accent);margin-bottom:7px}.note-list{padding-left:20px;font-size:13px;color:var(--muted);margin:10px 0 0}.note-list li{margin:7px 0}footer{font-size:12px;color:var(--muted);display:flex;gap:20px;flex-wrap:wrap;padding:10px 0}details{font-size:12px;color:var(--muted);margin-top:14px}summary{cursor:pointer}.empty{fill:var(--muted)}.chart-point:focus{outline:none;stroke:#202337;stroke-width:3px}.hint{font-size:12px;color:var(--muted)}
 @media(max-width:900px){.grid{grid-template-columns:1fr}.chart{aspect-ratio:1.65}.evidence{grid-template-columns:1fr}.nav{gap:14px}.nav,.wrap{padding-left:20px;padding-right:20px}}
 @media(max-width:560px){h1{font-size:28px}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:13px}.panel{padding:17px}.nav{gap:12px;flex-wrap:wrap}.nav .grow{display:none}.nav a{font-size:12px}.wrap{padding:25px 14px}.chartheading{flex-direction:column}.chart{min-height:205px}.seg button{padding:6px 12px}th,td{padding:10px 8px}}
+.chart-controls{display:grid;grid-template-columns:150px minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:end;margin:20px 0 12px}.chart-controls label{display:block;font-size:12px;color:var(--muted)}.chart-controls select{background:white;border:1px solid #d5d8e4;border-radius:7px;padding:8px 10px;color:var(--ink);font-size:13px;width:100%;min-width:0;margin-top:6px}.axis-inputs{display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:7px}.swap{height:39px;padding:0 12px;font-size:19px;color:var(--accent)}.plot-panel .chart{aspect-ratio:auto;height:440px;min-height:0}.point-detail{background:#f8f8fc;border:1px solid var(--line);border-radius:7px;padding:10px 13px;min-height:44px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.axis-note{font-size:12px;color:var(--muted);min-height:19px;margin-bottom:4px}.chart-point{cursor:pointer}.chart-point:hover{stroke:var(--ink);stroke-width:2.5px}
+@media(max-width:900px){.chart-controls{grid-template-columns:1fr 1fr;gap:12px}.chart-controls .view-field{grid-column:1/-1;max-width:220px}.swap{grid-column:1/-1;grid-row:3;justify-self:start;font-size:13px;height:31px}.swap::after{content:' 交换横纵轴'}}
+@media(max-width:560px){.chart-controls{grid-template-columns:1fr}.chart-controls .view-field{max-width:none}.swap{grid-row:auto}.plot-panel .chart{height:330px}}
 </style>
 </head>
 <body>
@@ -19,9 +22,17 @@
 <section class="stats" aria-label="实验概况"><div class="stat"><div class="value" id="model-count"></div><div class="label">研究模型</div></div><div class="stat"><div class="value" id="complete-count"></div><div class="label">已完成实验</div></div><div class="stat"><div class="value">8 h / 6 × 1 h</div><div class="label">Track A / Track B 预算上限</div></div><div class="stat"><div class="value">1 × H200</div><div class="label">相同任务、数据及评估器</div></div></section>
 <div class="notice"><strong>如何解读：</strong>A 与 B 都允许自我改进，预算规则不同。这里展示观察结果，尚无同预算 RSI-off 对照。ANALYSIS 分数在研究结束后计算，并不是 Agent 当时获得的反馈。</div>
 <section class="panel" aria-labelledby="filter-title"><h2 id="filter-title">选择比较范围</h2><div class="filters"><div class="seg" aria-label="选择 Track"><button data-track="B" aria-pressed="true">Track B</button><button data-track="A" aria-pressed="false">Track A</button></div><span id="track-desc" class="hint"></span><span class="grow"></span><button id="all" class="smallbutton">全部模型</button><button id="leading" class="smallbutton">聚焦主要模型</button></div><div class="legend" id="legend" aria-label="筛选模型"></div><p class="caption">点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。</p></section>
-<section class="grid charts" aria-label="结果图表">
-<div class="panel"><div class="chartheading"><div><h2>候选如何逐步改善？</h2><p class="hint">提交时刻 × 事后 ANALYSIS NLL</p></div><label class="hint">纵轴 <select id="scale" aria-label="候选曲线纵轴"><option value="linear">线性 · 全范围</option><option value="log">对数 · 展开低 NLL</option></select></label></div><svg id="curve" class="chart" role="img" aria-label="候选 NLL 随累计租约时间变化的曲线"></svg><p class="caption">横轴包含租约内的测量、训练和打包时间。圆点是已提交候选，连线只连接观测点；单个候选不代表只做过一次实验。</p></div>
-<div class="panel"><h2>质量与推理成本</h2><p class="hint">最终 TEST · 越靠左下越好</p><svg id="scatter" class="chart" role="img" aria-label="最终 TEST NLL 与每条任务推理耗时散点图"></svg><p class="caption">横轴为毫秒／任务，纵轴为 NLL。悬停或键盘聚焦数据点查看精确值；具体数值也列在下表。</p></div>
+<section class="panel plot-panel" aria-labelledby="plot-title">
+<h2 id="plot-title">自定义比较图</h2><p class="hint">先选候选过程或最终结果，再自由选择横轴、纵轴。颜色与上方模型一致。</p>
+<div class="chart-controls">
+<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选过程</option><option value="final">最终结果</option></select></label>
+<div><label for="x-metric">横轴</label><div class="axis-inputs"><select id="x-metric" aria-label="横轴指标"></select><select id="x-scale" aria-label="横轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
+<button id="swap-axes" class="smallbutton swap" aria-label="交换横纵轴" title="交换横纵轴">⇄</button>
+<div><label for="y-metric">纵轴</label><div class="axis-inputs"><select id="y-metric" aria-label="纵轴指标"></select><select id="y-scale" aria-label="纵轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
+</div>
+<div class="axis-note" id="axis-note"></div><svg id="comparison-chart" class="chart" role="img" aria-label="按所选横纵轴比较模型"></svg>
+<div class="point-detail" id="point-detail" aria-live="polite">悬停、点击或键盘聚焦数据点，查看模型和精确数值。</div>
+<p class="caption" id="plot-caption"></p>
 </section>
 <section class="panel"><div class="chartheading"><div><h2 id="table-title">Track B · 最终结果</h2><p class="hint">按 NLL 升序排列；提交候选数与元学习次数不同。</p></div><a class="smallbutton" href="rsi/data.json" download>下载汇总 JSON</a></div><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">TEST NLL ↓</th><th scope="col">Score ↑</th><th scope="col">ms/task ↓</th><th scope="col">租约小时</th><th scope="col">候选数</th><th scope="col">ANALYSIS 首 → 末</th></tr></thead><tbody id="results"></tbody></table></div><p class="caption">Score 与 NLL 来自同一个质量指标。租约小时包含运行环境内的全部占用，不等于纯 GPU 计算时间。</p></section>
 <section class="panel"><h2>同一模型在两种预算下的结果</h2><p class="hint">这是一组描述性配对，不合并成同一预算下的排名。</p><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">A · TEST NLL</th><th scope="col">B · TEST NLL</th><th scope="col">B − A</th><th scope="col">较低 NLL</th></tr></thead><tbody id="pairs"></tbody></table></div><p class="caption">负值表示本次 B 的 NLL 更低。结果同时受初始配方、实际训练量、推理配置和随机性影响，差值不等于 RSI 增益。</p></section>
@@ -848,40 +859,112 @@ models.forEach(m=>{const b=document.createElement('button');b.className='chip';b
 document.querySelectorAll('[data-track]').forEach(b=>b.addEventListener('click',()=>{track=b.dataset.track;render()}));
 $('#all').addEventListener('click',()=>{models.forEach(m=>visible.add(m));render()});
 $('#leading').addEventListener('click',()=>{visible.clear();models.filter(m=>['claude-fable-5-1','claude-opus-5','gpt-6-astra','kimi-k3','deepseek-v4-flash','glm-5.3','gpt-5.6-sol'].includes(m)).forEach(m=>visible.add(m));render()});
-$('#scale').addEventListener('change',render);
+const metricSets={
+ trajectory:{
+  hours:{label:'累计租约时间 / h',get:(r,p)=>p.hours,ordered:true},
+  index:{label:'候选提交序号',get:(r,p)=>p.index,ordered:true,integer:true},
+  lease:{label:'来源租约序号',get:(r,p)=>p.lease?Number(p.lease.split('-').pop()):null,ordered:true,integer:true},
+  nll:{label:'ANALYSIS NLL ↓',get:(r,p)=>p.nll},
+  improvement:{label:'较首候选 NLL 下降 ↑',get:(r,p)=>r.first_analysis==null?null:r.first_analysis-p.nll}
+ },
+ final:{
+  ms:{label:'TEST 推理耗时 / ms ↓',get:r=>r.ms},
+  test_nll:{label:'TEST NLL ↓',get:r=>r.test_nll},
+  score:{label:'TEST Score ↑',get:r=>r.score},
+  lease_hours:{label:'总租约时间 / h',get:r=>r.lease_hours},
+  research_hours:{label:'研究用时 / h',get:r=>r.research_hours},
+  candidates:{label:'提交候选数',get:r=>r.candidates,integer:true},
+  leases:{label:'使用租约数',get:r=>r.leases,integer:true},
+  first_analysis:{label:'首候选 ANALYSIS NLL ↓',get:r=>r.first_analysis},
+  final_analysis:{label:'最终候选 ANALYSIS NLL ↓',get:r=>r.final_analysis},
+  improvement:{label:'首末 ANALYSIS NLL 下降 ↑',get:r=>r.first_analysis==null||r.final_analysis==null?null:r.first_analysis-r.final_analysis}
+ }
+};
+const axisChoices={trajectory:{x:'hours',y:'nll',xs:'linear',ys:'linear'},final:{x:'ms',y:'test_nll',xs:'linear',ys:'linear'}};
+function fillAxes(){
+ const view=$('#plot-view').value,metrics=metricSets[view],choice=axisChoices[view];
+ for(const axis of ['x','y']){
+  $(`#${axis}-metric`).innerHTML=Object.entries(metrics).map(([key,m])=>`<option value="${key}">${esc(m.label)}</option>`).join('');
+  $(`#${axis}-metric`).value=choice[axis];$(`#${axis}-scale`).value=choice[axis+'s'];
+ }
+}
+$('#plot-view').addEventListener('change',()=>{fillAxes();render()});
+for(const id of ['x-metric','y-metric','x-scale','y-scale'])$('#'+id).addEventListener('change',()=>{
+ const a=axisChoices[$('#plot-view').value];a.x=$('#x-metric').value;a.y=$('#y-metric').value;a.xs=$('#x-scale').value;a.ys=$('#y-scale').value;render();
+});
+$('#swap-axes').addEventListener('click',()=>{
+ const a=axisChoices[$('#plot-view').value];[a.x,a.y]=[a.y,a.x];[a.xs,a.ys]=[a.ys,a.xs];fillAxes();render();
+});
 const NS='http://www.w3.org/2000/svg';
 function el(parent,tag,attrs={},text){const n=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;parent.appendChild(n);return n}
-function chart(selector,points,xlabel,ylabel,log=false){
- const svg=$(selector);svg.replaceChildren();svg.setAttribute('viewBox','0 0 660 410');
- if(!points.length){el(svg,'text',{x:330,y:195,'text-anchor':'middle',fill:'#656c80','font-size':16},'没有可显示的数据，请选择模型');return null;}
- const left=67,right=632,top=22,bottom=345,T=v=>log?Math.log10(v):v;
- let xs=points.map(p=>p.x),ys=points.map(p=>T(p.y)),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
- const xd=Math.max(x1-x0,.2),yd=Math.max(y1-y0,log?.025:.06);x0=Math.max(0,x0-xd*.08);x1+=xd*.1;y0-=yd*.12;y1+=yd*.12;
- const sx=x=>left+(x-x0)/(x1-x0)*(right-left),sy=y=>bottom-(T(y)-y0)/(y1-y0)*(bottom-top);
- for(let i=0;i<=5;i++){const xv=x0+(x1-x0)*i/5,yv=y0+(y1-y0)*i/5,yy=bottom-(bottom-top)*i/5;
- el(svg,'line',{x1:left,x2:right,y1:yy,y2:yy,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:yy+4,'text-anchor':'end',fill:'#656c80','font-size':12},(log?10**yv:yv).toFixed(2));
- el(svg,'text',{x:sx(xv),y:bottom+23,'text-anchor':'middle',fill:'#656c80','font-size':12},xv.toFixed(1));}
- el(svg,'line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#c8ccda'});
- el(svg,'text',{x:(left+right)/2,y:397,'text-anchor':'middle',fill:'#656c80','font-size':13},xlabel);
- el(svg,'text',{x:18,y:(top+bottom)/2,transform:`rotate(-90 18 ${(top+bottom)/2})`,'text-anchor':'middle',fill:'#656c80','font-size':13},ylabel+(log?' · 对数':''));
- return {svg,sx,sy};
+function axisDomain(values,log,integer){
+ const transform=v=>log?Math.log10(v):v;
+ let low=Math.min(...values.map(transform)),high=Math.max(...values.map(transform));
+ const span=high-low||Math.max(Math.abs(low)*.12,log?.08:integer?2:.1);
+ low-=span*.08;high+=span*.08;
+ if(!log&&Math.min(...values)>=0)low=Math.max(0,low);
+ let ticks=[];
+ if(integer&&!log){const step=Math.max(1,Math.ceil((high-low)/6));for(let v=Math.ceil(low/step)*step;v<=high;v+=step)ticks.push(v);}
+ else for(let i=0;i<=5;i++)ticks.push(low+(high-low)*i/5);
+ return {ratio:v=>(transform(v)-low)/(high-low),ticks:ticks.map(v=>({fraction:(v-low)/(high-low),value:log?10**v:v}))};
 }
-function dot(c,p,color,label,size=5){const n=el(c.svg,'circle',{cx:c.sx(p.x),cy:c.sy(p.y),r:size,fill:color,stroke:'white','stroke-width':1.5,tabindex:0,class:'chart-point','aria-label':label});el(n,'title',{},label);return n}
+function drawPlot(rows){
+ const view=$('#plot-view').value,choice=axisChoices[view],metrics=metricSets[view],xm=metrics[choice.x],ym=metrics[choice.y];
+ const points=[];
+ rows.forEach(r=>(view==='trajectory'?r.points:[null]).forEach(p=>{
+  const x=xm.get(r,p),y=ym.get(r,p);
+  if(Number.isFinite(x)&&Number.isFinite(y))points.push({x,y,row:r,candidate:p});
+ }));
+ const notes=[];
+ for(const axis of ['x','y']){
+  const select=$(`#${axis}-scale`),invalid=points.some(p=>p[axis]<=0);
+  select.querySelector('[value="log"]').disabled=invalid;
+  if(invalid){notes.push(`${axis==='x'?'横':'纵'}轴含零或负值，使用线性刻度`);if(select.value==='log'){select.value='linear';choice[axis+'s']='linear';}}
+ }
+ $('#axis-note').textContent=notes.join('；');
+ const trajectory=view==='trajectory',connected=trajectory&&(xm.ordered||ym.ordered);
+ $('#plot-caption').textContent=trajectory?
+  `每个点是一份已提交候选。${connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'}租约时间包含测量、训练和打包；NLL 下降混合了继续训练、方法变化与修复收益。`:
+  '每个点是一个模型的最终结果。TEST 与 ANALYSIS 分属不同评估集；首末 ANALYSIS 下降是观察差值，不等于 RSI 的因果增益。';
+ $('#point-detail').textContent='悬停、点击或键盘聚焦数据点，查看模型和精确数值。';
+ const svg=$('#comparison-chart');svg.replaceChildren();
+ const width=Math.max(300,svg.clientWidth),height=svg.clientHeight;
+ svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
+ svg.setAttribute('aria-label',`${track} 组${trajectory?'候选过程':'最终结果'}：横轴 ${xm.label}，纵轴 ${ym.label}`);
+ if(!points.length){el(svg,'text',{x:width/2,y:height/2,'text-anchor':'middle',fill:'#656c80','font-size':14},rows.length?'当前指标没有可用数据':'请选择至少一个模型');return;}
+ const xlog=choice.xs==='log',ylog=choice.ys==='log',xd=axisDomain(points.map(p=>p.x),xlog,xm.integer),yd=axisDomain(points.map(p=>p.y),ylog,ym.integer);
+ const left=64,right=width-23,top=20,bottom=height-62,sx=x=>left+xd.ratio(x)*(right-left),sy=y=>bottom-yd.ratio(y)*(bottom-top);
+ const tick=(v,integer)=>integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
+ yd.ticks.forEach(t=>{const y=bottom-t.fraction*(bottom-top);el(svg,'line',{x1:left,x2:right,y1:y,y2:y,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:y+4,'text-anchor':'end',fill:'#656c80','font-size':11},tick(t.value,ym.integer));});
+ xd.ticks.forEach(t=>{const x=left+t.fraction*(right-left);el(svg,'line',{x1:x,x2:x,y1:top,y2:bottom,stroke:'#f0f1f6'});el(svg,'text',{x,y:bottom+22,'text-anchor':'middle',fill:'#656c80','font-size':11},tick(t.value,xm.integer));});
+ el(svg,'line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#c8ccda'});
+ el(svg,'text',{x:(left+right)/2,y:height-10,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'x-label'},xm.label+(xlog?' · 对数':''));
+ el(svg,'text',{x:16,y:(top+bottom)/2,transform:`rotate(-90 16 ${(top+bottom)/2})`,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'y-label'},ym.label+(ylog?' · 对数':''));
+ if(connected)rows.forEach(r=>{
+  const ps=points.filter(p=>p.row===r);
+  if(ps.length>1)el(svg,'polyline',{points:ps.map(p=>`${sx(p.x)},${sy(p.y)}`).join(' '),fill:'none',stroke:defs[r.model][1],'stroke-width':2.1,opacity:.85});
+ });
+ points.forEach(p=>{
+  const r=p.row,stage=p.candidate?` · 提交 ${p.candidate.index}${p.candidate.final?' · 最终候选':''}`:' · 最终结果';
+  const label=`${defs[r.model][0]} · Track ${r.track}${stage} ｜ ${xm.label}：${fmt(p.x,xm.integer?0:6)} ｜ ${ym.label}：${fmt(p.y,ym.integer?0:6)}`;
+  const circle=el(svg,'circle',{cx:sx(p.x),cy:sy(p.y),r:!p.candidate||p.candidate.final?6:4.8,fill:defs[r.model][1],stroke:'white','stroke-width':1.5,tabindex:0,class:'chart-point','aria-label':label,'data-model-id':r.model,'data-x':p.x,'data-y':p.y});
+  el(circle,'title',{},label);
+  for(const event of ['pointerenter','focus','click'])circle.addEventListener(event,()=>{$('#point-detail').textContent=label;});
+ });
+}
 function render(){
  document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===track)));
  document.querySelectorAll('[data-model]').forEach(b=>b.setAttribute('aria-pressed',String(visible.has(b.dataset.model))));
  $('#track-desc').textContent=track==='A'?'最多 8 小时研究墙钟；可多次实验和开租约。':'最多 6 个训练租约，每次最多 1 小时。';
  $('#table-title').textContent=`Track ${track} · 最终结果`;
  const rows=D.rows.filter(r=>r.track===track&&visible.has(r.model)).sort((a,b)=>(a.test_nll??Infinity)-(b.test_nll??Infinity));
- let pts=rows.flatMap(r=>r.points.filter(p=>p.nll!=null).map(p=>({x:p.hours,y:p.nll})));
- const curve=chart('#curve',pts,'累计训练租约时间 / h','ANALYSIS NLL',$('#scale').value==='log');
- if(curve)rows.forEach(r=>{const ps=r.points.filter(p=>p.nll!=null);if(!ps.length)return;const col=defs[r.model][1];el(curve.svg,'polyline',{points:ps.map(p=>`${curve.sx(p.hours)},${curve.sy(p.nll)}`).join(' '),fill:'none',stroke:col,'stroke-width':2.3});ps.forEach(p=>dot(curve,{x:p.hours,y:p.nll},col,`${defs[r.model][0]} · ${r.track} · 提交 ${p.index} · ${p.hours.toFixed(3)} h · ANALYSIS ${p.nll.toFixed(6)}${p.final?' · 最终候选':''}`,p.final?6:4.8))});
- const valid=rows.filter(r=>r.test_nll!=null&&r.ms!=null),scatter=chart('#scatter',valid.map(r=>({x:r.ms,y:r.test_nll})),'TEST 推理耗时 / ms per task','TEST NLL');
- if(scatter)valid.forEach(r=>dot(scatter,{x:r.ms,y:r.test_nll},defs[r.model][1],`${defs[r.model][0]} · ${r.track} · TEST ${r.test_nll.toFixed(6)} · ${r.ms.toFixed(3)} ms/task`,6));
+ drawPlot(rows);
  $('#results').innerHTML=rows.length?rows.map(r=>`<tr><td><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])}</td><td class="num">${fmt(r.test_nll)}</td><td class="num">${fmt(r.score,2)}</td><td class="num">${fmt(r.ms,3)}</td><td class="num">${fmt(r.lease_hours,2)}</td><td>${r.candidates}</td><td class="num">${fmt(r.first_analysis,3)} → ${fmt(r.final_analysis,3)}</td></tr>`).join(''):'<tr><td colspan="7">请选择模型。</td></tr>';
  $('#pairs').innerHTML=models.filter(m=>visible.has(m)).map(m=>{const a=D.rows.find(r=>r.model===m&&r.track==='A'),b=D.rows.find(r=>r.model===m&&r.track==='B'),diff=a?.test_nll!=null&&b?.test_nll!=null?b.test_nll-a.test_nll:null;return `<tr><td>${esc(defs[m][0])}</td><td class="num">${fmt(a?.test_nll)}</td><td class="num">${fmt(b?.test_nll)}</td><td class="num" style="color:${diff<0?'var(--green)':'var(--orange)'}">${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${diff==null?'未完成':diff<0?'B':diff>0?'A':'相同'}</td></tr>`}).join('')||'<tr><td colspan="5">请选择模型。</td></tr>';
 }
+fillAxes();
 render();
+let resizeFrame;window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(render);});
 </script>
 </body>
 </html>
