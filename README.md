@@ -7,7 +7,7 @@
   Both views expose Score, NLL, perplexity, inference latency, evaluation time
   and throughput. Time, candidate/lease counts, improvements and Agent token
   usage are also available where recorded. Both views default to Score versus
-  seconds per task (s/task).
+  seconds per task (s/task). The initial data view is Final · TEST.
   A cursor-following tooltip shows full metrics on hover near a point; touch
   users can tap, and keyboard users can focus a point (Escape dismisses).
   Candidate metrics come from their own postmortem ANALYSIS evaluations;

@@ -28,7 +28,7 @@
 <h2 id="plot-title">自定义比较图</h2><p class="hint">横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。</p>
 <div class="plot-presets" aria-label="常用指标组合"><button type="button" class="smallbutton" data-preset="score-time">Score × 时间</button><button type="button" class="smallbutton" data-preset="nll-time">NLL × 时间</button><button type="button" class="smallbutton" data-preset="score-cost">Score × s/task</button></div>
 <div class="chart-controls">
-<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选 · ANALYSIS</option><option value="final">最终 · TEST</option></select></label>
+<label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选 · ANALYSIS</option><option value="final" selected>最终 · TEST</option></select></label>
 <div><label for="x-metric">横轴</label><div class="axis-inputs"><select id="x-metric" aria-label="横轴指标"></select><select id="x-scale" aria-label="横轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
 <button id="swap-axes" class="smallbutton swap" aria-label="交换横纵轴" title="交换横纵轴">⇄</button>
 <div><label for="y-metric">纵轴</label><div class="axis-inputs"><select id="y-metric" aria-label="纵轴指标"></select><select id="y-scale" aria-label="纵轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
