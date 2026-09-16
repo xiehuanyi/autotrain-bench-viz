@@ -11,6 +11,9 @@
   users can tap, and keyboard users can focus a point (Escape dismisses).
   Candidate metrics come from their own postmortem ANALYSIS evaluations;
   final metrics come from TEST. Perplexity is derived as exp(mean NLL).
+  `Seconds per task (s/task)` uses the original `time_per_task` values, matching
+  the earlier viewer. It is available on either axis in both views and is the
+  default cost axis. The separate millisecond option remains available.
 
 Only the latest selected H200 campaign is displayed. Older experiment pages
 have been removed from the published site. `/rsi/` is an alias of the homepage.

@@ -25,7 +25,7 @@
 <section class="panel" aria-labelledby="filter-title"><h2 id="filter-title">选择比较范围</h2><div class="filters"><div class="seg" aria-label="选择 Track"><button data-track="B" aria-pressed="true">Track B</button><button data-track="A" aria-pressed="false">Track A</button></div><span id="track-desc" class="hint"></span><span class="grow"></span><button id="all" class="smallbutton">全部模型</button><button id="leading" class="smallbutton">聚焦主要模型</button></div><div class="legend" id="legend" aria-label="筛选模型"></div><p class="caption">点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。</p></section>
 <section class="panel plot-panel" aria-labelledby="plot-title">
 <h2 id="plot-title">自定义比较图</h2><p class="hint">横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。</p>
-<div class="plot-presets" aria-label="常用指标组合"><button type="button" class="smallbutton" data-preset="score-time">Score × 时间</button><button type="button" class="smallbutton" data-preset="nll-time">NLL × 时间</button><button type="button" class="smallbutton" data-preset="score-cost">Score × 推理耗时</button></div>
+<div class="plot-presets" aria-label="常用指标组合"><button type="button" class="smallbutton" data-preset="score-time">Score × 时间</button><button type="button" class="smallbutton" data-preset="nll-time">NLL × 时间</button><button type="button" class="smallbutton" data-preset="score-cost">Score × s/task</button></div>
 <div class="chart-controls">
 <label class="view-field">数据范围<select id="plot-view" aria-label="图表数据范围"><option value="trajectory">候选 · ANALYSIS</option><option value="final">最终 · TEST</option></select></label>
 <div><label for="x-metric">横轴</label><div class="axis-inputs"><select id="x-metric" aria-label="横轴指标"></select><select id="x-scale" aria-label="横轴刻度"><option value="linear">线性</option><option value="log">对数</option></select></div></div>
@@ -36,7 +36,7 @@
 <div class="point-detail" id="point-detail" aria-live="polite">悬停、点击或键盘聚焦数据点，查看模型和精确数值。</div>
 <p class="caption" id="plot-caption"></p>
 </section>
-<section class="panel"><div class="chartheading"><div><h2 id="table-title">Track B · 最终结果</h2><p class="hint">按 NLL 升序排列；提交候选数与元学习次数不同。</p></div><a class="smallbutton" href="rsi/data.json" download>下载汇总 JSON</a></div><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">TEST NLL ↓</th><th scope="col">Score ↑</th><th scope="col">ms/task ↓</th><th scope="col">租约小时</th><th scope="col">候选数</th><th scope="col">ANALYSIS 首 → 末</th></tr></thead><tbody id="results"></tbody></table></div><p class="caption">Score 与 NLL 来自同一个质量指标。租约小时包含运行环境内的全部占用，不等于纯 GPU 计算时间。</p></section>
+<section class="panel"><div class="chartheading"><div><h2 id="table-title">Track B · 最终结果</h2><p class="hint">按 NLL 升序排列；提交候选数与元学习次数不同。</p></div><a class="smallbutton" href="rsi/data.json" download>下载汇总 JSON</a></div><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">TEST NLL ↓</th><th scope="col">Score ↑</th><th scope="col">s/task ↓</th><th scope="col">租约小时</th><th scope="col">候选数</th><th scope="col">ANALYSIS 首 → 末</th></tr></thead><tbody id="results"></tbody></table></div><p class="caption">s/task 为每条任务的推理秒数（1 s = 1000 ms）。Score 与 NLL 来自同一个质量指标。租约小时包含运行环境内的全部占用，不等于纯 GPU 计算时间。</p></section>
 <section class="panel"><h2>同一模型在两种预算下的结果</h2><p class="hint">这是一组描述性配对，不合并成同一预算下的排名。</p><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">A · TEST NLL</th><th scope="col">B · TEST NLL</th><th scope="col">B − A</th><th scope="col">较低 NLL</th></tr></thead><tbody id="pairs"></tbody></table></div><p class="caption">负值表示本次 B 的 NLL 更低。结果同时受初始配方、实际训练量、推理配置和随机性影响，差值不等于 RSI 增益。</p></section>
 <section class="panel"><div class="eyebrow">Reading the evidence</div><h2 style="margin-top:8px">三个值得保留的判断</h2><div class="evidence"><article><div class="tag">01 / 方法改进</div><h3>Fable / Opus：完整的反馈闭环</h3><p>A 组都通过测量瓶颈，把训练吞吐提升到约 2.1 倍。Opus 还调整不稳定的训练策略，并放弃实测无收益的权重平均。B 组两者只差 0.00031 NLL，单次实验不足以区分优劣。</p></article><article><div class="tag">02 / 诊断与取舍</div><h3>Astra / Kimi：不同的适应能力</h3><p>Astra 比较上下文长度与校准方案，在 B 组获得最低的推理耗时点估计。Kimi 在更换验证样本后，把旧、新候选放到相同样本上重测，避免把测量变化误判为进步。</p></article><article><div class="tag">03 / 归因边界</div><h3>首末涨幅需要结合起点</h3><p>早期保险候选、错误修复、更多梯度训练和方法更新，都可能拉大首末差值。Flash B 到第 5 租约才提交首候选，不能与从第 1 租约开始提交的曲线直接比较涨幅。</p></article></div><details><summary>其余模型的过程证据</summary><ul class="note-list"><li>DeepSeek Flash：B 的高吞吐配方与持续训练获得优秀终点；A 的退火与低学习率续训也改善了自评与候选结果。</li><li>GLM：通过 profiling、CUDA graphs 与位置表示调整提高吞吐；实现收益没有全部转化成最优质量。</li><li>Sonnet：B 修复逐元素输出检查瓶颈，本地 1000 样本耗时约 25 s → 3.4 s；A 的自评未充分覆盖最终表现。</li><li>Sol：B 候选稳定改善，主要沿相同配方续训；方法层改进的独立贡献尚未识别。</li><li>DeepSeek Pro：两轨初始配方、搜索成本和最终结果差异较大。</li><li>Terra / Luna：错误修复、验证覆盖和预算分配仍限制结果；大幅下降不能自动归因于更强元学习。</li></ul></details></section>
 <section class="panel"><h2>数据口径与复现</h2><ul class="note-list"><li>每个模型／Track 采用最新授权尝试。GLM B 与 Flash A 的旧失败尝试单独排除。</li><li>本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。</li><li>A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。</li><li>页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。</li></ul><details><summary>查看数据身份</summary><p id="provenance" style="overflow-wrap:anywhere;margin-top:12px"></p></details></section>
@@ -72,6 +72,7 @@
       "outcome": "success",
       "test_nll": 6.359444763140411,
       "score": 41.25172744871658,
+      "seconds_per_task": 0.02905222325921386,
       "ms": 29.05222325921386,
       "ppl": 577.9253818194371,
       "evaluation_seconds": 59.49895323486999,
@@ -96,6 +97,7 @@
           "nll": 20.7544659948457,
           "score": 0.0,
           "ppl": 1031691984.5218021,
+          "seconds_per_task": 0.030369924336355325,
           "ms": 30.369924336355325,
           "evaluation_seconds": 62.197605040855706,
           "tasks_per_second": 32.927312854807376,
@@ -112,6 +114,7 @@
           "nll": 6.462881619076471,
           "score": 40.29618229804548,
           "ppl": 640.9052429463804,
+          "seconds_per_task": 0.02943418453423874,
           "ms": 29.43418453423874,
           "evaluation_seconds": 60.28120992612094,
           "tasks_per_second": 33.974102419476566,
@@ -132,6 +135,7 @@
       "outcome": "success",
       "test_nll": 3.788062542227833,
       "score": 65.00604392981427,
+      "seconds_per_task": 0.004777960676392468,
       "ms": 4.777960676392468,
       "ppl": 44.17073837925039,
       "evaluation_seconds": 9.785263465251774,
@@ -156,6 +160,7 @@
           "nll": 3.8266165565840007,
           "score": 64.64988363159607,
           "ppl": 45.90695160021351,
+          "seconds_per_task": 0.004775839541025562,
           "ms": 4.775839541025562,
           "evaluation_seconds": 9.78091938002035,
           "tasks_per_second": 209.38726927690297,
@@ -176,6 +181,7 @@
       "outcome": "success",
       "test_nll": 3.229495537606164,
       "score": 70.16606148604242,
+      "seconds_per_task": 0.005981626528864581,
       "ms": 5.981626528864581,
       "ppl": 25.26690755076386,
       "evaluation_seconds": 12.250371131114662,
@@ -200,6 +206,7 @@
           "nll": 3.583498869310492,
           "score": 66.89579419233638,
           "ppl": 35.99927751800758,
+          "seconds_per_task": 0.005979985827707424,
           "ms": 5.979985827707424,
           "evaluation_seconds": 12.247010975144804,
           "tasks_per_second": 167.22447658097124,
@@ -216,6 +223,7 @@
           "nll": 3.3930209645596427,
           "score": 68.65542074466677,
           "ppl": 29.755707566329168,
+          "seconds_per_task": 0.005829052737681195,
           "ms": 5.829052737681195,
           "evaluation_seconds": 11.937900006771088,
           "tasks_per_second": 171.55446090504944,
@@ -232,6 +240,7 @@
           "nll": 3.331842280193082,
           "score": 69.22058675480768,
           "ppl": 27.98985939722665,
+          "seconds_per_task": 0.006031939562490152,
           "ms": 6.031939562490152,
           "evaluation_seconds": 12.35341222397983,
           "tasks_per_second": 165.78415443989832,
@@ -248,6 +257,7 @@
           "nll": 3.2607105545192345,
           "score": 69.87769852518602,
           "ppl": 26.06805333646252,
+          "seconds_per_task": 0.005942903682580436,
           "ms": 5.942903682580436,
           "evaluation_seconds": 12.171066741924733,
           "tasks_per_second": 168.26791302897163,
@@ -264,6 +274,7 @@
           "nll": 3.225357166697916,
           "score": 70.20429157547495,
           "ppl": 25.162559779427617,
+          "seconds_per_task": 0.0056687125386361,
           "ms": 5.6687125386361,
           "evaluation_seconds": 11.609523279126734,
           "tasks_per_second": 176.40689895356755,
@@ -280,6 +291,7 @@
           "nll": 3.2175719170956056,
           "score": 70.27621137076387,
           "ppl": 24.967423548644657,
+          "seconds_per_task": 0.005743525006892014,
           "ms": 5.743525006892014,
           "evaluation_seconds": 11.762739214114845,
           "tasks_per_second": 174.109105262019,
@@ -300,6 +312,7 @@
       "outcome": "success",
       "test_nll": 3.134502695392341,
       "score": 71.04360120729993,
+      "seconds_per_task": 0.005241482888095561,
       "ms": 5.241482888095561,
       "ppl": 22.977206329716893,
       "evaluation_seconds": 10.734556954819709,
@@ -324,6 +337,7 @@
           "nll": 3.185325654525792,
           "score": 70.57410093388923,
           "ppl": 24.17515987431068,
+          "seconds_per_task": 0.005480226780264275,
           "ms": 5.480226780264275,
           "evaluation_seconds": 11.223504445981234,
           "tasks_per_second": 182.4742004475546,
@@ -344,6 +358,7 @@
       "outcome": "success",
       "test_nll": 3.017565853133928,
       "score": 72.12385864110948,
+      "seconds_per_task": 0.005750144274543345,
       "ms": 5.750144274543345,
       "ppl": 20.441473527710844,
       "evaluation_seconds": 11.77629547426477,
@@ -368,6 +383,7 @@
           "nll": 3.5329726321582053,
           "score": 67.36255336106412,
           "ppl": 34.22555653669179,
+          "seconds_per_task": 0.006032888488789467,
           "ms": 6.032888488789467,
           "evaluation_seconds": 12.35535562504083,
           "tasks_per_second": 165.75807788561588,
@@ -384,6 +400,7 @@
           "nll": 3.0321317570884605,
           "score": 71.9892994575096,
           "ppl": 20.74140112323943,
+          "seconds_per_task": 0.005923672694962079,
           "ms": 5.923672694962079,
           "evaluation_seconds": 12.131681679282337,
           "tasks_per_second": 168.81418867900527,
@@ -404,6 +421,7 @@
       "outcome": "success",
       "test_nll": 3.058128111567686,
       "score": 71.74914627194579,
+      "seconds_per_task": 0.005485652499828575,
       "ms": 5.485652499828575,
       "ppl": 21.287671696702812,
       "evaluation_seconds": 11.234616319648921,
@@ -428,6 +446,7 @@
           "nll": 3.2009684868958432,
           "score": 70.42959313269309,
           "ppl": 24.556301140192538,
+          "seconds_per_task": 0.005526260570377417,
           "ms": 5.526260570377417,
           "evaluation_seconds": 11.31778164813295,
           "tasks_per_second": 180.9541890515135,
@@ -444,6 +463,7 @@
           "nll": 3.0890940126996425,
           "score": 71.46308463177866,
           "ppl": 21.957176039030692,
+          "seconds_per_task": 0.005546785478827587,
           "ms": 5.546785478827587,
           "evaluation_seconds": 11.359816660638899,
           "tasks_per_second": 180.2845997590965,
@@ -464,6 +484,7 @@
       "outcome": "success",
       "test_nll": 3.438659371901475,
       "score": 68.23381513392782,
+      "seconds_per_task": 0.0059451668294059345,
       "ms": 5.9451668294059345,
       "ppl": 31.14517606926735,
       "evaluation_seconds": 12.175701666623354,
@@ -488,6 +509,7 @@
           "nll": 3.470289980848834,
           "score": 67.9416129520372,
           "ppl": 32.1460628359082,
+          "seconds_per_task": 0.0058945008686350775,
           "ms": 5.8945008686350775,
           "evaluation_seconds": 12.071937778964639,
           "tasks_per_second": 169.649648424186,
@@ -508,6 +530,7 @@
       "outcome": "success",
       "test_nll": 3.0364002220492186,
       "score": 71.94986756491049,
+      "seconds_per_task": 0.006242106470836006,
       "ms": 6.242106470836006,
       "ppl": 20.83012428832192,
       "evaluation_seconds": 12.783834052272141,
@@ -532,6 +555,7 @@
           "nll": 3.590522183491794,
           "score": 66.83091312313866,
           "ppl": 36.25300170369986,
+          "seconds_per_task": 0.005802400994070922,
           "ms": 5.802400994070922,
           "evaluation_seconds": 11.883317235857248,
           "tasks_per_second": 172.34244944839762,
@@ -548,6 +572,7 @@
           "nll": 3.3754107811171576,
           "score": 68.8181028490155,
           "ppl": 29.236291031181658,
+          "seconds_per_task": 0.005873021916158905,
           "ms": 5.873021916158905,
           "evaluation_seconds": 12.027948884293437,
           "tasks_per_second": 170.27009506785964,
@@ -564,6 +589,7 @@
           "nll": 3.2545898160684796,
           "score": 69.9342416392648,
           "ppl": 25.908984904806573,
+          "seconds_per_task": 0.00593496662418147,
           "ms": 5.93496662418147,
           "evaluation_seconds": 12.154811646323651,
           "tasks_per_second": 168.49294416005523,
@@ -580,6 +606,7 @@
           "nll": 3.239617306231056,
           "score": 70.07255703022534,
           "ppl": 25.52395202066686,
+          "seconds_per_task": 0.0057030439024856605,
           "ms": 5.7030439024856605,
           "evaluation_seconds": 11.679833912290633,
           "tasks_per_second": 175.34495913036054,
@@ -596,6 +623,7 @@
           "nll": 3.1756899543711703,
           "score": 70.66311511043922,
           "ppl": 23.943333978667702,
+          "seconds_per_task": 0.005767190767073771,
           "ms": 5.767190767073771,
           "evaluation_seconds": 11.811206690967083,
           "tasks_per_second": 173.39464574489747,
@@ -612,6 +640,7 @@
           "nll": 3.0649334698114874,
           "score": 71.68627867016501,
           "ppl": 21.433035995821218,
+          "seconds_per_task": 0.005752141458060578,
           "ms": 5.752141458060578,
           "evaluation_seconds": 11.780385706108063,
           "tasks_per_second": 173.84829759335668,
@@ -632,6 +661,7 @@
       "outcome": "success",
       "test_nll": 3.149064944548225,
       "score": 70.90907578657011,
+      "seconds_per_task": 0.005226121973691988,
       "ms": 5.226121973691988,
       "ppl": 23.314254265049836,
       "evaluation_seconds": 10.703097802121192,
@@ -656,6 +686,7 @@
           "nll": 3.6054832246612007,
           "score": 66.6927036792316,
           "ppl": 36.799461969029565,
+          "seconds_per_task": 0.005314896788377155,
           "ms": 5.314896788377155,
           "evaluation_seconds": 10.884908622596413,
           "tasks_per_second": 188.15040814844102,
@@ -672,6 +703,7 @@
           "nll": 3.309682952468253,
           "score": 69.42529365505108,
           "ppl": 27.376444461684923,
+          "seconds_per_task": 0.005348094431155914,
           "ms": 5.348094431155914,
           "evaluation_seconds": 10.952897395007312,
           "tasks_per_second": 186.98248747710767,
@@ -688,6 +720,7 @@
           "nll": 3.2035448862840767,
           "score": 70.40579246783972,
           "ppl": 24.619649549787923,
+          "seconds_per_task": 0.005254499657667111,
           "ms": 5.254499657667111,
           "evaluation_seconds": 10.761215298902243,
           "tasks_per_second": 190.31307739088888,
@@ -708,6 +741,7 @@
       "outcome": "success",
       "test_nll": 2.986191461153635,
       "score": 72.41369390186563,
+      "seconds_per_task": 0.004962810632264336,
       "ms": 4.962810632264336,
       "ppl": 19.810091134988937,
       "evaluation_seconds": 10.16383617487736,
@@ -732,6 +766,7 @@
           "nll": 3.0258160244890764,
           "score": 72.04764391900414,
           "ppl": 20.610816781966324,
+          "seconds_per_task": 0.004926358596208047,
           "ms": 4.926358596208047,
           "evaluation_seconds": 10.08918240503408,
           "tasks_per_second": 202.98968913260342,
@@ -752,6 +787,7 @@
       "outcome": "success",
       "test_nll": 2.88529248349031,
       "score": 73.34579424406338,
+      "seconds_per_task": 0.005995534990688611,
       "ms": 5.995534990688611,
       "ppl": 17.90880485932868,
       "evaluation_seconds": 12.278855660930276,
@@ -776,6 +812,7 @@
           "nll": 7.771034468087212,
           "score": 28.211523499237067,
           "ppl": 2370.922664034981,
+          "seconds_per_task": 0.0045752031177244135,
           "ms": 4.5752031177244135,
           "evaluation_seconds": 9.370015985099599,
           "tasks_per_second": 218.56953107196122,
@@ -792,6 +829,7 @@
           "nll": 2.886063029217994,
           "score": 73.33867597633574,
           "ppl": 17.922609730360108,
+          "seconds_per_task": 0.006015095246652891,
           "ms": 6.015095246652891,
           "evaluation_seconds": 12.31891506514512,
           "tasks_per_second": 166.24840654958066,
@@ -812,6 +850,7 @@
       "outcome": "success",
       "test_nll": 3.122259727831594,
       "score": 71.15670120610235,
+      "seconds_per_task": 0.004683376078673973,
       "ms": 4.683376078673973,
       "ppl": 22.697612161512687,
       "evaluation_seconds": 9.591554209124297,
@@ -836,6 +875,7 @@
           "nll": 4.375368536329834,
           "score": 59.58053684584858,
           "ppl": 79.46912141455611,
+          "seconds_per_task": 0.005301226430674433,
           "ms": 5.301226430674433,
           "evaluation_seconds": 10.856911730021238,
           "tasks_per_second": 188.63559462650193,
@@ -852,6 +892,7 @@
           "nll": 4.474357311632436,
           "score": 58.66608286950438,
           "ppl": 87.73819396915967,
+          "seconds_per_task": 0.005432205831993997,
           "ms": 5.432205831993997,
           "evaluation_seconds": 11.125157543923706,
           "tasks_per_second": 184.0872807341563,
@@ -868,6 +909,7 @@
           "nll": 4.164212934348758,
           "score": 61.531183060721695,
           "ppl": 64.34202111443108,
+          "seconds_per_task": 0.0052369748045748565,
           "ms": 5.2369748045748565,
           "evaluation_seconds": 10.725324399769306,
           "tasks_per_second": 190.94993528065697,
@@ -884,6 +926,7 @@
           "nll": 4.207483568490142,
           "score": 61.13145083523892,
           "ppl": 67.18725477737075,
+          "seconds_per_task": 0.005328661324710993,
           "ms": 5.328661324710993,
           "evaluation_seconds": 10.913098393008113,
           "tasks_per_second": 187.66439431281296,
@@ -900,6 +943,7 @@
           "nll": 3.254495762351258,
           "score": 69.93511050339048,
           "ppl": 25.90654818306,
+          "seconds_per_task": 0.005627136368502761,
           "ms": 5.627136368502761,
           "evaluation_seconds": 11.524375282693654,
           "tasks_per_second": 177.7102836173268,
@@ -916,6 +960,7 @@
           "nll": 3.1322024045527033,
           "score": 71.06485119345871,
           "ppl": 22.924412815973234,
+          "seconds_per_task": 0.004517626364759053,
           "ms": 4.517626364759053,
           "evaluation_seconds": 9.25209879502654,
           "tasks_per_second": 221.35518063219354,
@@ -936,6 +981,7 @@
       "outcome": "success",
       "test_nll": 3.017252226719791,
       "score": 72.12675590820486,
+      "seconds_per_task": 0.0062553301547723095,
       "ms": 6.2553301547723095,
       "ppl": 20.435063546890856,
       "evaluation_seconds": 12.81091615697369,
@@ -960,6 +1006,7 @@
           "nll": 3.3912709365136458,
           "score": 68.67158742720714,
           "ppl": 29.703679781878936,
+          "seconds_per_task": 0.006290217187370217,
           "ms": 6.290217187370217,
           "evaluation_seconds": 12.882364799734205,
           "tasks_per_second": 158.97702260708027,
@@ -976,6 +1023,7 @@
           "nll": 3.2464250203171936,
           "score": 70.00966766527613,
           "ppl": 25.69830458621688,
+          "seconds_per_task": 0.00621913666736873,
           "ms": 6.21913666736873,
           "evaluation_seconds": 12.736791894771159,
           "tasks_per_second": 160.79402230327455,
@@ -992,6 +1040,7 @@
           "nll": 3.1696913272763023,
           "score": 70.71853016515365,
           "ppl": 23.800136769446166,
+          "seconds_per_task": 0.006248432998518183,
           "ms": 6.248432998518183,
           "evaluation_seconds": 12.796790780965239,
           "tasks_per_second": 160.04012529815878,
@@ -1008,6 +1057,7 @@
           "nll": 3.1374654593206923,
           "score": 71.01623132372508,
           "ppl": 23.045383314088596,
+          "seconds_per_task": 0.006218034558060026,
           "ms": 6.218034558060026,
           "evaluation_seconds": 12.734534774906933,
           "tasks_per_second": 160.82252207874373,
@@ -1024,6 +1074,7 @@
           "nll": 3.044046764266998,
           "score": 71.87922914237261,
           "ppl": 20.990013232823408,
+          "seconds_per_task": 0.006155366227176273,
           "ms": 6.155366227176273,
           "evaluation_seconds": 12.606190033257008,
           "tasks_per_second": 162.45987047609714,
@@ -1044,6 +1095,7 @@
       "outcome": "success",
       "test_nll": 3.161392606646895,
       "score": 70.795193383331,
+      "seconds_per_task": 0.006348233416929361,
       "ms": 6.348233416929361,
       "ppl": 23.60344336409984,
       "evaluation_seconds": 13.001182037871331,
@@ -1068,6 +1120,7 @@
           "nll": 3.2000519050285434,
           "score": 70.43806047589068,
           "ppl": 24.533803591836982,
+          "seconds_per_task": 0.006408895285176186,
           "ms": 6.408895285176186,
           "evaluation_seconds": 13.125417544040829,
           "tasks_per_second": 156.0331313749198,
@@ -1084,6 +1137,7 @@
           "nll": 3.1733102544637486,
           "score": 70.68509867409274,
           "ppl": 23.88642377048062,
+          "seconds_per_task": 0.006442496038516765,
           "ms": 6.442496038516765,
           "evaluation_seconds": 13.194231886882335,
           "tasks_per_second": 155.21934263078364,
@@ -1100,6 +1154,7 @@
           "nll": 3.1733102544637486,
           "score": 70.68509867409274,
           "ppl": 23.88642377048062,
+          "seconds_per_task": 0.006529467514610587,
           "ms": 6.529467514610587,
           "evaluation_seconds": 13.372349469922483,
           "tasks_per_second": 153.1518455007796,
@@ -1120,6 +1175,7 @@
       "outcome": "success",
       "test_nll": 3.247955036400625,
       "score": 69.99553344362232,
+      "seconds_per_task": 0.006678744517557789,
       "ms": 6.678744517557789,
       "ppl": 25.73765350011012,
       "evaluation_seconds": 13.678068771958351,
@@ -1144,6 +1200,7 @@
           "nll": 3.2834213768823868,
           "score": 69.66789694159692,
           "ppl": 26.666854157368842,
+          "seconds_per_task": 0.0067885132943956705,
           "ms": 6.7885132943956705,
           "evaluation_seconds": 13.902875226922333,
           "tasks_per_second": 147.30765878083506,
@@ -1164,6 +1221,7 @@
       "outcome": "success",
       "test_nll": 3.7066179119344222,
       "score": 65.75842586196788,
+      "seconds_per_task": 0.011390191824148133,
       "ms": 11.390191824148133,
       "ppl": 40.71586874584725,
       "evaluation_seconds": 23.327112855855376,
@@ -1188,6 +1246,7 @@
           "nll": 3.793098750428555,
           "score": 64.95951965874647,
           "ppl": 44.39375251555291,
+          "seconds_per_task": 0.01147692753318097,
           "ms": 11.47692753318097,
           "evaluation_seconds": 23.504747587954625,
           "tasks_per_second": 87.1313334608847,
@@ -1208,6 +1267,7 @@
       "outcome": "success",
       "test_nll": 3.64037417043656,
       "score": 66.37038264833541,
+      "seconds_per_task": 0.02178464821781745,
       "ms": 21.78464821781745,
       "ppl": 38.10609223140406,
       "evaluation_seconds": 44.614959550090134,
@@ -1232,6 +1292,7 @@
           "nll": 3.715562529614639,
           "score": 65.67579587508756,
           "ppl": 41.08169025306201,
+          "seconds_per_task": 0.022030572419453165,
           "ms": 22.030572419453165,
           "evaluation_seconds": 45.11861231504008,
           "tasks_per_second": 45.391466956028445,
@@ -1252,6 +1313,7 @@
       "outcome": "success",
       "test_nll": 3.153931641503035,
       "score": 70.8641174529774,
+      "seconds_per_task": 0.005515821313451852,
       "ms": 5.515821313451852,
       "ppl": 23.427994219739112,
       "evaluation_seconds": 11.296402049949393,
@@ -1276,6 +1338,7 @@
           "nll": 3.1705159381380508,
           "score": 70.7109124460824,
           "ppl": 23.81977071480709,
+          "seconds_per_task": 0.005449867834386168,
           "ms": 5.449867834386168,
           "evaluation_seconds": 11.161329324822873,
           "tasks_per_second": 183.49068828613755,
@@ -1296,6 +1359,7 @@
       "outcome": "success",
       "test_nll": 3.4941142968437533,
       "score": 67.72152496298354,
+      "seconds_per_task": 0.005543276047319523,
       "ms": 5.543276047319523,
       "ppl": 32.92111669940808,
       "evaluation_seconds": 11.352629344910383,
@@ -1320,6 +1384,7 @@
           "nll": 3.551453179774088,
           "score": 67.19183087055242,
           "ppl": 34.86394427244461,
+          "seconds_per_task": 0.005645032651386828,
           "ms": 5.645032651386828,
           "evaluation_seconds": 11.561026870040223,
           "tasks_per_second": 177.14689387214221,
@@ -1340,6 +1405,7 @@
       "outcome": "success",
       "test_nll": 2.916379053399159,
       "score": 73.05861787101352,
+      "seconds_per_task": 0.005186905573623335,
       "ms": 5.186905573623335,
       "ppl": 18.474271851135924,
       "evaluation_seconds": 10.62278261478059,
@@ -1364,6 +1430,7 @@
           "nll": 4.661999963745717,
           "score": 56.93264825702211,
           "ppl": 105.84756189662814,
+          "seconds_per_task": 0.005142097363773246,
           "ms": 5.142097363773246,
           "evaluation_seconds": 10.531015401007608,
           "tasks_per_second": 194.4731749042972,
@@ -1380,6 +1447,7 @@
           "nll": 2.9361170224208113,
           "score": 72.87627937655662,
           "ppl": 18.842538922715907,
+          "seconds_per_task": 0.004996623987267412,
           "ms": 4.996623987267412,
           "evaluation_seconds": 10.23308592592366,
           "tasks_per_second": 200.13513175060564,
@@ -1400,6 +1468,7 @@
       "outcome": "success",
       "test_nll": 3.1074060893991597,
       "score": 71.29391846822321,
+      "seconds_per_task": 0.006002029170872447,
       "ms": 6.002029170872447,
       "ppl": 22.362961579383267,
       "evaluation_seconds": 12.292155741946772,
@@ -1424,6 +1493,7 @@
           "nll": 10.836687763656013,
           "score": 0.0,
           "ppl": 50852.66268652917,
+          "seconds_per_task": 0.003965667229522296,
           "ms": 3.965667229522296,
           "evaluation_seconds": 8.121686486061662,
           "tasks_per_second": 252.1643754058658,
@@ -1440,6 +1510,7 @@
           "nll": 3.4145236583375556,
           "score": 68.45677980010296,
           "ppl": 30.40246401758441,
+          "seconds_per_task": 0.006291344190003656,
           "ms": 6.291344190003656,
           "evaluation_seconds": 12.884672901127487,
           "tasks_per_second": 158.94854419011193,
@@ -1456,6 +1527,7 @@
           "nll": 3.1799817861989528,
           "score": 70.62346735574462,
           "ppl": 24.046315573268107,
+          "seconds_per_task": 0.006129045676289024,
           "ms": 6.129045676289024,
           "evaluation_seconds": 12.552285545039922,
           "tasks_per_second": 163.15753753779717,
@@ -1472,6 +1544,7 @@
           "nll": 3.191800861126631,
           "score": 70.51428325854485,
           "ppl": 24.332206936465926,
+          "seconds_per_task": 0.00612039860538971,
           "ms": 6.12039860538971,
           "evaluation_seconds": 12.534576343838125,
           "tasks_per_second": 163.3880510853306,
@@ -1492,6 +1565,7 @@
       "outcome": "success",
       "test_nll": 3.0783356460307036,
       "score": 71.562469952481,
+      "seconds_per_task": 0.005576860892574587,
       "ms": 5.576860892574587,
       "ppl": 21.722218832285126,
       "evaluation_seconds": 11.421411107992753,
@@ -1516,6 +1590,7 @@
           "nll": 3.1922240685001784,
           "score": 70.51037368733968,
           "ppl": 24.342506685167187,
+          "seconds_per_task": 0.005620221803269487,
           "ms": 5.620221803269487,
           "evaluation_seconds": 11.51021425309591,
           "tasks_per_second": 177.92892078000617,
@@ -1532,6 +1607,7 @@
           "nll": 3.104102615758474,
           "score": 71.3244358132175,
           "ppl": 22.289208013830294,
+          "seconds_per_task": 0.0054669981797133005,
           "ms": 5.4669981797133005,
           "evaluation_seconds": 11.19641227205284,
           "tasks_per_second": 182.915736776858,
@@ -1548,6 +1624,7 @@
           "nll": 3.0933389509519023,
           "score": 71.42387007788355,
           "ppl": 22.050581004406418,
+          "seconds_per_task": 0.005568542564446943,
           "ms": 5.568542564446943,
           "evaluation_seconds": 11.40437517198734,
           "tasks_per_second": 179.58020225698286,
@@ -1582,6 +1659,7 @@ const metricSets={
   score:{label:'Score ↑',get:(r,p)=>p.score},
   nll:{label:'NLL ↓',get:(r,p)=>p.nll},
   ppl:{label:'困惑度 PPL ↓',get:(r,p)=>p.ppl},
+  seconds_per_task:{label:'Seconds per task (s/task) ↓',get:(r,p)=>p.seconds_per_task,decimals:4},
   ms:{label:'推理耗时 / ms per task ↓',get:(r,p)=>p.ms},
   evaluation_seconds:{label:'评估总耗时 / s ↓',get:(r,p)=>p.evaluation_seconds},
   tasks_per_second:{label:'推理吞吐 / tasks per s ↑',get:(r,p)=>p.tasks_per_second},
@@ -1597,6 +1675,7 @@ const metricSets={
   score:{label:'Score ↑',get:r=>r.score},
   nll:{label:'NLL ↓',get:r=>r.test_nll},
   ppl:{label:'困惑度 PPL ↓',get:r=>r.ppl},
+  seconds_per_task:{label:'Seconds per task (s/task) ↓',get:r=>r.seconds_per_task,decimals:4},
   ms:{label:'推理耗时 / ms per task ↓',get:r=>r.ms},
   evaluation_seconds:{label:'评估总耗时 / s ↓',get:r=>r.evaluation_seconds},
   tasks_per_second:{label:'推理吞吐 / tasks per s ↑',get:r=>r.tasks_per_second},
@@ -1614,7 +1693,7 @@ const metricSets={
   improvement:{label:'首末 ANALYSIS NLL 下降 ↑',get:r=>r.first_analysis==null||r.final_analysis==null?null:r.first_analysis-r.final_analysis}
  }
 };
-const axisChoices={trajectory:{x:'hours',y:'score',xs:'linear',ys:'linear'},final:{x:'ms',y:'score',xs:'linear',ys:'linear'}};
+const axisChoices={trajectory:{x:'hours',y:'score',xs:'linear',ys:'linear'},final:{x:'seconds_per_task',y:'score',xs:'linear',ys:'linear'}};
 function fillAxes(){
  const view=$('#plot-view').value,metrics=metricSets[view],choice=axisChoices[view];
  for(const axis of ['x','y']){
@@ -1631,7 +1710,7 @@ $('#swap-axes').addEventListener('click',()=>{
 });
 document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{
  const view=$('#plot-view').value,a=axisChoices[view];
- a.x=b.dataset.preset==='score-cost'?'ms':view==='trajectory'?'hours':'lease_hours';
+ a.x=b.dataset.preset==='score-cost'?'seconds_per_task':view==='trajectory'?'hours':'lease_hours';
  a.y=b.dataset.preset==='nll-time'?'nll':'score';a.xs=a.ys='linear';fillAxes();render();
 }));
 let plottedPoints=[],activePoint=null,tooltipPinned=false;
@@ -1649,7 +1728,7 @@ function showTooltip(point,event){
   activePoint=point;point.circle.setAttribute('data-active','true');
   const entries=[
    ['Score',pretty(v.score,4),'primary'],['NLL',pretty(c?c.nll:r.test_nll,6),'primary'],
-   ['困惑度 PPL',pretty(v.ppl,3)],['推理耗时 · ms/task',pretty(v.ms,4)],
+   ['困惑度 PPL',pretty(v.ppl,3)],['推理耗时 · s/task',pretty(v.seconds_per_task,6)],
    ['评估总耗时 · s',pretty(v.evaluation_seconds,3)],['推理吞吐 · tasks/s',pretty(v.tasks_per_second,2)],
    ['租约累计 · h',pretty(c?c.hours:r.lease_hours,3)],['研究用时 · h',pretty(v.research_hours,3)],
   ];
@@ -1660,7 +1739,7 @@ function showTooltip(point,event){
   const choice=axisChoices[$('#plot-view').value],set=metricSets[$('#plot-view').value];
   const axes=`横轴 ${esc(set[choice.x].label)}：${pretty(point.x,set[choice.x].integer?0:6)}<br>纵轴 ${esc(set[choice.y].label)}：${pretty(point.y,set[choice.y].integer?0:6)}`;
   tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${r.track}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>候选 ID ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>样本数 ${pretty(v.task_count,0)} · ${esc(budget)}<br>${c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。'}PPL = exp(NLL)。</div>`;
-  $('#point-detail').textContent=`${defs[r.model][0]} · Track ${r.track} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.ms,4)} ms/task`;
+  $('#point-detail').textContent=`${defs[r.model][0]} · Track ${r.track} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.seconds_per_task,6)} s/task (${pretty(v.ms,4)} ms/task)`;
  }
  tooltip.hidden=false;
  const anchor=point.circle.getBoundingClientRect(),x=event?.clientX??(anchor.left+anchor.width/2),y=event?.clientY??(anchor.top+anchor.height/2);
@@ -1688,10 +1767,15 @@ $('#comparison-chart').addEventListener('pointerleave',()=>{if(!tooltipPinned)hi
 $('#comparison-chart').addEventListener('click',event=>{const p=nearestPoint(event);if(p){tooltipPinned=true;showTooltip(p,event);}else hideTooltip();});
 document.addEventListener('keydown',event=>{if(event.key==='Escape')hideTooltip();});
 document.addEventListener('pointerdown',event=>{if(!event.target.closest('#comparison-chart'))hideTooltip();});
-window.addEventListener('scroll',hideTooltip,{passive:true});
+window.addEventListener('scroll',()=>{
+ if(!activePoint)return;
+ const rect=activePoint.circle.getBoundingClientRect();
+ if(rect.bottom<0||rect.top>innerHeight||rect.right<0||rect.left>innerWidth)hideTooltip();
+ else showTooltip(activePoint);
+},{passive:true});
 const NS='http://www.w3.org/2000/svg';
 function el(parent,tag,attrs={},text){const n=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));if(text!==undefined)n.textContent=text;parent.appendChild(n);return n}
-function axisDomain(values,log,integer){
+function axisDomain(values,log,integer,count=5){
  const transform=v=>log?Math.log10(v):v;
  let low=Math.min(...values.map(transform)),high=Math.max(...values.map(transform));
  const span=high-low||Math.max(Math.abs(low)*.12,log?.08:integer?2:.1);
@@ -1699,7 +1783,7 @@ function axisDomain(values,log,integer){
  if(!log&&Math.min(...values)>=0)low=Math.max(0,low);
  let ticks=[];
  if(integer&&!log){const step=Math.max(1,Math.ceil((high-low)/6));for(let v=Math.ceil(low/step)*step;v<=high;v+=step)ticks.push(v);}
- else for(let i=0;i<=5;i++)ticks.push(low+(high-low)*i/5);
+ else for(let i=0;i<=count;i++)ticks.push(low+(high-low)*i/count);
  return {ratio:v=>(transform(v)-low)/(high-low),ticks:ticks.map(v=>({fraction:(v-low)/(high-low),value:log?10**v:v}))};
 }
 function drawPlot(rows){
@@ -1727,11 +1811,12 @@ function drawPlot(rows){
  svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
  svg.setAttribute('aria-label',`${track} 组${trajectory?'候选过程':'最终结果'}：横轴 ${xm.label}，纵轴 ${ym.label}`);
  if(!points.length){el(svg,'text',{x:width/2,y:height/2,'text-anchor':'middle',fill:'#656c80','font-size':14},rows.length?'当前指标没有可用数据':'请选择至少一个模型');return;}
- const xlog=choice.xs==='log',ylog=choice.ys==='log',xd=axisDomain(points.map(p=>p.x),xlog,xm.integer),yd=axisDomain(points.map(p=>p.y),ylog,ym.integer);
+ const xlog=choice.xs==='log',ylog=choice.ys==='log',tickCount=width<560?3:5,xd=axisDomain(points.map(p=>p.x),xlog,xm.integer,tickCount),yd=axisDomain(points.map(p=>p.y),ylog,ym.integer,tickCount);
  const left=64,right=width-23,top=20,bottom=height-62,sx=x=>left+xd.ratio(x)*(right-left),sy=y=>bottom-yd.ratio(y)*(bottom-top);
- const tick=(v,integer)=>Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e4?(v/1e3).toFixed(1)+'k':integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
- yd.ticks.forEach(t=>{const y=bottom-t.fraction*(bottom-top);el(svg,'line',{x1:left,x2:right,y1:y,y2:y,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:y+4,'text-anchor':'end',fill:'#656c80','font-size':11},tick(t.value,ym.integer));});
- xd.ticks.forEach(t=>{const x=left+t.fraction*(right-left);el(svg,'line',{x1:x,x2:x,y1:top,y2:bottom,stroke:'#f0f1f6'});el(svg,'text',{x,y:bottom+22,'text-anchor':'middle',fill:'#656c80','font-size':11},tick(t.value,xm.integer));});
+ const precision=(domain,metric)=>{if(metric.decimals==null)return undefined;const gaps=domain.ticks.slice(1).map((t,i)=>Math.abs(t.value-domain.ticks[i].value));return Math.min(8,Math.max(metric.decimals,Math.ceil(-Math.log10(Math.min(...gaps)||1))));};
+ const tick=(v,integer,decimals)=>decimals!=null?v.toFixed(decimals):Math.abs(v)>=1e6?(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e4?(v/1e3).toFixed(1)+'k':integer&&Number.isInteger(v)?String(v):Math.abs(v)>=1000?v.toFixed(0):Math.abs(v)>=10?v.toFixed(1):v.toFixed(2);
+ yd.ticks.forEach(t=>{const y=bottom-t.fraction*(bottom-top);el(svg,'line',{x1:left,x2:right,y1:y,y2:y,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:y+4,'text-anchor':'end',fill:'#656c80','font-size':11,class:'y-tick'},tick(t.value,ym.integer,precision(yd,ym)));});
+ xd.ticks.forEach(t=>{const x=left+t.fraction*(right-left);el(svg,'line',{x1:x,x2:x,y1:top,y2:bottom,stroke:'#f0f1f6'});el(svg,'text',{x,y:bottom+22,'text-anchor':'middle',fill:'#656c80','font-size':11,class:'x-tick'},tick(t.value,xm.integer,precision(xd,xm)));});
  el(svg,'line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#c8ccda'});
  el(svg,'text',{x:(left+right)/2,y:height-10,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'x-label'},xm.label+(xlog?' · 对数':''));
  el(svg,'text',{x:16,y:(top+bottom)/2,transform:`rotate(-90 16 ${(top+bottom)/2})`,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'y-label'},ym.label+(ylog?' · 对数':''));
@@ -1756,7 +1841,7 @@ function render(){
  $('#table-title').textContent=`Track ${track} · 最终结果`;
  const rows=D.rows.filter(r=>r.track===track&&visible.has(r.model)).sort((a,b)=>(a.test_nll??Infinity)-(b.test_nll??Infinity));
  drawPlot(rows);
- $('#results').innerHTML=rows.length?rows.map(r=>`<tr><td><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])}</td><td class="num">${fmt(r.test_nll)}</td><td class="num">${fmt(r.score,2)}</td><td class="num">${fmt(r.ms,3)}</td><td class="num">${fmt(r.lease_hours,2)}</td><td>${r.candidates}</td><td class="num">${fmt(r.first_analysis,3)} → ${fmt(r.final_analysis,3)}</td></tr>`).join(''):'<tr><td colspan="7">请选择模型。</td></tr>';
+ $('#results').innerHTML=rows.length?rows.map(r=>`<tr><td><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])}</td><td class="num">${fmt(r.test_nll)}</td><td class="num">${fmt(r.score,2)}</td><td class="num">${fmt(r.seconds_per_task,6)}</td><td class="num">${fmt(r.lease_hours,2)}</td><td>${r.candidates}</td><td class="num">${fmt(r.first_analysis,3)} → ${fmt(r.final_analysis,3)}</td></tr>`).join(''):'<tr><td colspan="7">请选择模型。</td></tr>';
  $('#pairs').innerHTML=models.filter(m=>visible.has(m)).map(m=>{const a=D.rows.find(r=>r.model===m&&r.track==='A'),b=D.rows.find(r=>r.model===m&&r.track==='B'),diff=a?.test_nll!=null&&b?.test_nll!=null?b.test_nll-a.test_nll:null;return `<tr><td>${esc(defs[m][0])}</td><td class="num">${fmt(a?.test_nll)}</td><td class="num">${fmt(b?.test_nll)}</td><td class="num" style="color:${diff<0?'var(--green)':'var(--orange)'}">${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${diff==null?'未完成':diff<0?'B':diff>0?'A':'相同'}</td></tr>`}).join('')||'<tr><td colspan="5">请选择模型。</td></tr>';
 }
 fillAxes();
