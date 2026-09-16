@@ -127,7 +127,11 @@ def main():
     template = (ROOT / 'tools' / 'rsi-template.html').read_text()
     if template.count('__RSI_DATA__') != 1:
         raise ValueError('The template must contain exactly one data placeholder.')
+    if template.count('__I18N_DATA__') != 1:
+        raise ValueError('The template must contain exactly one translation placeholder.')
+    translations = json.loads((ROOT / 'tools' / 'translations.json').read_text())
     page = template.replace('__RSI_DATA__', payload.replace('<', '\\u003c'))
+    page = page.replace('__I18N_DATA__', json.dumps(translations, ensure_ascii=False).replace('<', '\\u003c'))
     (output / 'index.html').write_text(page.replace('__DATA_URL__', 'data.json'))
     (ROOT / 'index.html').write_text(page.replace('__DATA_URL__', 'rsi/data.json'))
     print(f"Built latest-only dashboard: {len(data['rows'])} runs, snapshot {data['generated_at']}")

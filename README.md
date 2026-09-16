@@ -18,6 +18,16 @@
 Only the latest selected H200 campaign is displayed. Older experiment pages
 have been removed from the published site. `/rsi/` is an alias of the homepage.
 
+## Languages
+
+Use the **中文 / English** switch in the header. Navigation, chart metrics,
+tooltips, tables, explanatory notes, and accessibility labels switch together.
+Changing language preserves the selected track, models, axes, and data view.
+The choice is saved locally. `?lang=en` and `?lang=zh` provide direct links and
+override the saved preference; otherwise the browser language is used initially.
+Translation strings are maintained in `tools/translations.json` and embedded
+in the generated HTML, so both languages also work offline.
+
 ## Rebuild the RSI dashboard
 
 Python 3 standard library only; no installation or browser-side dependencies.
@@ -38,7 +48,7 @@ model identifiers, numeric results, candidate trajectories and public metadata.
 It does not export raw transcripts, commands, workspace text, private paths,
 or credentials. The HTML embeds `rsi/data.json` and works offline.
 
-Source: `tools/build_rsi.py` and `tools/rsi-template.html`.
+Source: `tools/build_rsi.py`, `tools/rsi-template.html`, and `tools/translations.json`.
 GitHub Pages serves `main` from the repository root. Commit and push generated
 `index.html`, `rsi/index.html` and `rsi/data.json` to publish; this is a snapshot, not a live monitor.
 

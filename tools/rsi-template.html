@@ -11,13 +11,14 @@
 @media(max-width:900px){.grid{grid-template-columns:1fr}.chart{aspect-ratio:1.65}.evidence{grid-template-columns:1fr}.nav{gap:14px}.nav,.wrap{padding-left:20px;padding-right:20px}}
 @media(max-width:560px){h1{font-size:28px}.stats{grid-template-columns:repeat(2,1fr);gap:10px}.stat{padding:13px}.panel{padding:17px}.nav{gap:12px;flex-wrap:wrap}.nav .grow{display:none}.nav a{font-size:12px}.wrap{padding:25px 14px}.chartheading{flex-direction:column}.chart{min-height:205px}.seg button{padding:6px 12px}th,td{padding:10px 8px}}
 .chart-controls{display:grid;grid-template-columns:150px minmax(0,1fr) auto minmax(0,1fr);gap:16px;align-items:end;margin:20px 0 12px}.chart-controls label{display:block;font-size:12px;color:var(--muted)}.chart-controls select{background:white;border:1px solid #d5d8e4;border-radius:7px;padding:8px 10px;color:var(--ink);font-size:13px;width:100%;min-width:0;margin-top:6px}.axis-inputs{display:grid;grid-template-columns:minmax(0,1fr) 78px;gap:7px}.swap{height:39px;padding:0 12px;font-size:19px;color:var(--accent)}.plot-panel .chart{aspect-ratio:auto;height:440px;min-height:0}.point-detail{background:#f8f8fc;border:1px solid var(--line);border-radius:7px;padding:10px 13px;min-height:44px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}.axis-note{font-size:12px;color:var(--muted);min-height:19px;margin-bottom:4px}.chart-point{cursor:pointer}.chart-point:hover{stroke:var(--ink);stroke-width:2.5px}
-@media(max-width:900px){.chart-controls{grid-template-columns:1fr 1fr;gap:12px}.chart-controls .view-field{grid-column:1/-1;max-width:220px}.swap{grid-column:1/-1;grid-row:3;justify-self:start;font-size:13px;height:31px}.swap::after{content:' 交换横纵轴'}}
+@media(max-width:900px){.chart-controls{grid-template-columns:1fr 1fr;gap:12px}.chart-controls .view-field{grid-column:1/-1;max-width:220px}.swap{grid-column:1/-1;grid-row:3;justify-self:start;font-size:13px;height:31px}.swap::after{content:' ' attr(data-swap-label)}}
 @media(max-width:560px){.chart-controls{grid-template-columns:1fr}.chart-controls .view-field{max-width:none}.swap{grid-row:auto}.plot-panel .chart{height:330px}}
 .plot-presets{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.plot-presets button{color:var(--accent);background:#f5f3ff;border-color:#ddd8f4}.chart-point[data-active=true]{stroke:var(--ink);stroke-width:3px}.graph-tooltip{position:fixed;z-index:1000;width:340px;max-width:calc(100vw - 20px);padding:16px;background:rgba(255,255,255,.98);border:1px solid #ccc6e6;border-radius:11px;box-shadow:0 12px 38px #20233726;pointer-events:none;color:var(--ink);font-size:12px;line-height:1.45}.graph-tooltip[hidden]{display:none}.tooltip-title{font-size:15px;font-weight:700;margin-bottom:4px}.tooltip-subtitle{font-size:11px;color:var(--muted);margin-bottom:12px;overflow-wrap:anywhere}.tooltip-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px 15px;margin:0}.tooltip-metrics dt{font-size:11px;color:var(--muted)}.tooltip-metrics dd{margin:2px 0 0;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}.tooltip-metrics .primary dd{font-size:20px;color:var(--accent)}.tooltip-footer{border-top:1px solid var(--line);padding-top:9px;margin-top:12px;font-size:11px;color:var(--muted)}
 </style>
+<style>.nav{flex-wrap:wrap}.language-switch{flex-shrink:0}.language-switch button{padding:5px 10px;font-size:12px}.tooltip-metrics>div{min-width:0}.tooltip-metrics dd{overflow-wrap:anywhere}html[lang=en] .chart-controls{grid-template-columns:210px minmax(0,1fr) auto minmax(0,1fr)}@media(max-width:900px){html[lang=en] .chart-controls{grid-template-columns:1fr 1fr}}@media(max-width:560px){html[lang=en] .chart-controls{grid-template-columns:1fr}.nav{gap:10px}.language-switch{margin-left:auto}}</style>
 </head>
 <body>
-<header><nav class="nav" aria-label="页面导航"><a class="brand" href="#">AutoTrain-Bench</a><a class="active" href="#" aria-current="page">RSI 分析</a><a href="#table-title">最新实验结果</a><div class="grow"></div><a href="https://github.com/xiehuanyi/autotrain-bench-viz/tree/main/tools">可视化脚本 ↗</a></nav></header>
+<header><nav class="nav" aria-label="页面导航"><a class="brand" href="#">AutoTrain-Bench</a><a class="active" href="#" aria-current="page">RSI 分析</a><a href="#table-title">最新实验结果</a><div class="grow"></div><a href="https://github.com/xiehuanyi/autotrain-bench-viz/tree/main/tools">可视化脚本 ↗</a><div class="seg language-switch" role="group" aria-label="页面语言"><button type="button" data-lang="zh" lang="zh-CN" aria-pressed="true">中文</button><button type="button" data-lang="en" lang="en" aria-pressed="false">English</button></div></nav></header>
 <main class="wrap">
 <div class="intro"><div class="eyebrow">Research notes / H200 experiments</div><h1>从实验中学习，模型做得如何？</h1><p class="muted">把 RSI 看作 meta-learning：内层训练语言模型，外层根据实验反馈调整方法。一起看最终质量、候选轨迹，以及每次改进花掉的预算。</p><div class="stamp" id="stamp"></div></div>
 <section class="stats" aria-label="实验概况"><div class="stat"><div class="value" id="model-count"></div><div class="label">研究模型</div></div><div class="stat"><div class="value" id="complete-count"></div><div class="label">已完成实验</div></div><div class="stat"><div class="value">8 h / 6 × 1 h</div><div class="label">Track A / Track B 预算上限</div></div><div class="stat"><div class="value">1 × H200</div><div class="label">相同任务、数据及评估器</div></div></section>
@@ -44,16 +45,48 @@
 </main>
 <div id="graph-tooltip" class="graph-tooltip" role="tooltip" hidden></div>
 <script type="application/json" id="rsi-data">__RSI_DATA__</script>
+<script type="application/json" id="i18n-data">__I18N_DATA__</script>
 <script>
 'use strict';
 const D=JSON.parse(document.getElementById('rsi-data').textContent), $=s=>document.querySelector(s);
+const EN=JSON.parse($('#i18n-data').textContent);
+const languageKey='autotrain-language';
+const normalizeLanguage=value=>/^zh(?:-|$)/i.test(value||'')?'zh':/^en(?:-|$)/i.test(value||'')?'en':null;
+let savedLanguage=null;try{savedLanguage=normalizeLanguage(localStorage.getItem(languageKey));}catch{}
+let language=normalizeLanguage(new URLSearchParams(location.search).get('lang'))||savedLanguage||normalizeLanguage(navigator.language)||'en';
+function t(source,params={}){
+ const value=language==='en'?(EN[source]??source):source;
+ return value.replace(/\{(\w+)\}/g,(match,key)=>params[key]??match);
+}
+// Retain original static text once. Dynamic chart strings use t() explicitly.
+const staticText=[],staticAttributes=[],walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
+while(walker.nextNode()){
+ const node=walker.currentNode,source=node.textContent.trim();
+ if(!node.parentElement.closest('script,style,[data-lang]')&&Object.hasOwn(EN,source))staticText.push({node,source,original:node.textContent});
+}
+document.querySelectorAll('[aria-label],[title]').forEach(node=>{
+ for(const attr of ['aria-label','title']){const source=node.getAttribute(attr);if(Object.hasOwn(EN,source))staticAttributes.push({node,attr,source});}
+});
+function applyLanguage(){
+ document.documentElement.lang=language==='en'?'en':'zh-CN';
+ staticText.forEach(({node,source,original})=>{node.textContent=original.replace(source,t(source));});
+ staticAttributes.forEach(({node,attr,source})=>node.setAttribute(attr,t(source)));
+ document.querySelectorAll('[data-lang]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.lang===language)));
+ $('#swap-axes').dataset.swapLabel=t('交换横纵轴');
+ $('#stamp').textContent=t('数据快照：{time} · lm-pretrain · 单卡 H200',{time:D.generated_at.replace('T',' ').replace('+00:00',' UTC')});
+ $('#provenance').textContent=t('Core: {revision} · 源快照 SHA256: {hash}',{revision:D.core_revision,hash:D.source_sha256});
+}
+document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener('click',()=>{
+ language=button.dataset.lang;
+ try{localStorage.setItem(languageKey,language);}catch{}
+ try{const url=new URL(location.href);url.searchParams.set('lang',language);history.replaceState(null,'',url);}catch{}
+ applyLanguage();fillAxes();render();
+}));
 const defs={
 'claude-fable-5-1':['Fable 5.1','#a43d75'],'claude-opus-5':['Opus 5','#d98030'],'gpt-6-astra':['Astra','#287dc1'],'kimi-k3':['Kimi K3','#1c9681'],'deepseek-v4-flash':['DeepSeek Flash','#9268c0'],'glm-5.3':['GLM 5.3','#73853d'],'claude-sonnet-5':['Sonnet 5','#c45749'],'gpt-5.6-sol':['Sol','#4e97b3'],'deepseek-v4-pro':['DeepSeek Pro','#5c549e'],'gpt-5.6-terra':['Terra','#67718a'],'gpt-5.6-luna':['Luna','#a17d4f']};
 const models=Object.keys(defs).filter(m=>D.rows.some(r=>r.model===m)), visible=new Set(models);let track='B';
 const fmt=(n,d=4)=>n==null?'—':Number(n).toFixed(d), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-$('#stamp').textContent=`数据快照：${D.generated_at.replace('T',' ').replace('+00:00',' UTC')} · lm-pretrain · 单卡 H200`;
 $('#model-count').textContent=models.length;$('#complete-count').textContent=`${D.rows.filter(r=>r.test_nll!=null).length} / ${D.rows.length}`;
-$('#provenance').textContent=`Core: ${D.core_revision} · 源快照 SHA256: ${D.source_sha256}`;
 models.forEach(m=>{const b=document.createElement('button');b.className='chip';b.setAttribute('aria-pressed','true');b.innerHTML=`<span class="dot" style="background:${defs[m][1]}"></span>${esc(defs[m][0])}`;b.dataset.model=m;b.addEventListener('click',()=>{visible.has(m)?visible.delete(m):visible.add(m);render()});$('#legend').append(b)});
 document.querySelectorAll('[data-track]').forEach(b=>b.addEventListener('click',()=>{track=b.dataset.track;render()}));
 $('#all').addEventListener('click',()=>{models.forEach(m=>visible.add(m));render()});
@@ -101,7 +134,7 @@ const axisChoices={trajectory:{x:'hours',y:'score',xs:'linear',ys:'linear'},fina
 function fillAxes(){
  const view=$('#plot-view').value,metrics=metricSets[view],choice=axisChoices[view];
  for(const axis of ['x','y']){
-  $(`#${axis}-metric`).innerHTML=Object.entries(metrics).map(([key,m])=>`<option value="${key}">${esc(m.label)}</option>`).join('');
+  $(`#${axis}-metric`).innerHTML=Object.entries(metrics).map(([key,m])=>`<option value="${key}">${esc(t(m.label))}</option>`).join('');
   $(`#${axis}-metric`).value=choice[axis];$(`#${axis}-scale`).value=choice[axis+'s'];
  }
 }
@@ -119,7 +152,7 @@ document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click'
 }));
 let plottedPoints=[],activePoint=null,tooltipPinned=false;
 const tooltip=$('#graph-tooltip');
-const pretty=(v,d=3)=>v==null?'未记录':Number(v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
+const pretty=(v,d=3)=>v==null?t('未记录'):Number(v).toLocaleString('en-US',{maximumFractionDigits:d,minimumFractionDigits:d});
 function hideTooltip(){
  tooltip.hidden=true;tooltipPinned=false;
  if(activePoint?.circle)activePoint.circle.removeAttribute('data-active');
@@ -138,11 +171,11 @@ function showTooltip(point,event){
   ];
   if(c)entries.push(['较首候选 Score 提升',pretty(c.score-r.points[0].score,4)],['输入吞吐 · tokens/s',pretty(c.input_tokens_per_second,0)]);
   else entries.push(['提交候选 / 使用租约',`${r.candidates} / ${r.leases}`],['Agent 推理 tokens',pretty(r.reasoning_tokens,0)]);
-  const stage=c?`候选 #${c.index} · ${c.lease}${c.final?' · 最终选定':''}`:'最终选定结果';
-  const budget=`${pretty(r.budget_hours,0)} h ${r.track==='A'?'研究墙钟上限':'租约总上限'}`;
+  const stage=c?`${t('候选 #{index}',{index:c.index})} · ${c.lease}${c.final?' · '+t('最终选定'):''}`:t('最终选定结果');
+  const budget=`${pretty(r.budget_hours,0)} h ${t(r.track==='A'?'研究墙钟上限':'租约总上限')}`;
   const choice=axisChoices[$('#plot-view').value],set=metricSets[$('#plot-view').value];
-  const axes=`横轴 ${esc(set[choice.x].label)}：${pretty(point.x,set[choice.x].integer?0:6)}<br>纵轴 ${esc(set[choice.y].label)}：${pretty(point.y,set[choice.y].integer?0:6)}`;
-  tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${r.track}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>候选 ID ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(label)}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>样本数 ${pretty(v.task_count,0)} · ${esc(budget)}<br>${c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。'}PPL = exp(NLL)。</div>`;
+  const axes=`${t('横轴')} ${esc(t(set[choice.x].label))}: ${pretty(point.x,set[choice.x].integer?0:6)}<br>${t('纵轴')} ${esc(t(set[choice.y].label))}: ${pretty(point.y,set[choice.y].integer?0:6)}`;
+  tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${r.track}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>${t('候选 ID')} ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(t(label))}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>${t('样本数')} ${pretty(v.task_count,0)} · ${esc(budget)}<br>${t(c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。')}${t('PPL = exp(NLL)。')}</div>`;
   $('#point-detail').textContent=`${defs[r.model][0]} · Track ${r.track} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.seconds_per_task,6)} s/task (${pretty(v.ms,4)} ms/task)`;
  }
  tooltip.hidden=false;
@@ -192,7 +225,7 @@ function axisDomain(values,log,integer,count=5){
 }
 function drawPlot(rows){
  hideTooltip();plottedPoints=[];
- const view=$('#plot-view').value,choice=axisChoices[view],metrics=metricSets[view],xm=metrics[choice.x],ym=metrics[choice.y];
+ const view=$('#plot-view').value,choice=axisChoices[view],metrics=metricSets[view],xm={...metrics[choice.x],label:t(metrics[choice.x].label)},ym={...metrics[choice.y],label:t(metrics[choice.y].label)};
  const points=[];
  rows.forEach(r=>(view==='trajectory'?r.points:[null]).forEach(p=>{
   const x=xm.get(r,p),y=ym.get(r,p);
@@ -202,19 +235,19 @@ function drawPlot(rows){
  for(const axis of ['x','y']){
   const select=$(`#${axis}-scale`),invalid=points.some(p=>p[axis]<=0);
   select.querySelector('[value="log"]').disabled=invalid;
-  if(invalid){notes.push(`${axis==='x'?'横':'纵'}轴含零或负值，使用线性刻度`);if(select.value==='log'){select.value='linear';choice[axis+'s']='linear';}}
+  if(invalid){notes.push(t('{axis}含零或负值，使用线性刻度',{axis:t(axis==='x'?'横轴':'纵轴')}));if(select.value==='log'){select.value='linear';choice[axis+'s']='linear';}}
  }
- $('#axis-note').textContent=notes.join('；');
+ $('#axis-note').textContent=notes.join('; ');
  const trajectory=view==='trajectory',connected=trajectory&&(xm.ordered||ym.ordered);
  $('#plot-caption').textContent=trajectory?
-  `每个点是一份已提交候选，Score / NLL / 耗时均来自该候选的 ANALYSIS 评估。${connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'}租约时间包含测量、训练和打包。`:
-  '每个点是一个模型的最终 TEST 结果。Score / NLL / 耗时均来自 TEST；首末 ANALYSIS 下降单独标注。观察差值不等于 RSI 因果增益。';
- $('#point-detail').textContent='悬停、点击或键盘聚焦数据点，查看模型和精确数值。';
+  [t('每个点是一份已提交候选，Score / NLL / 耗时均来自该候选的 ANALYSIS 评估。'),t(connected?'同色连线按提交顺序连接，不表示中间训练轨迹。':'当前组合显示散点；选择时间或序号指标可查看连线。'),t('租约时间包含测量、训练和打包。')].join(' '):
+  t('每个点是一个模型的最终 TEST 结果。Score / NLL / 耗时均来自 TEST；首末 ANALYSIS 下降单独标注。观察差值不等于 RSI 因果增益。');
+ $('#point-detail').textContent=t('悬停、点击或键盘聚焦数据点，查看模型和精确数值。');
  const svg=$('#comparison-chart');svg.replaceChildren();
  const width=Math.max(300,svg.clientWidth),height=svg.clientHeight;
  svg.setAttribute('viewBox',`0 0 ${width} ${height}`);
- svg.setAttribute('aria-label',`${track} 组${trajectory?'候选过程':'最终结果'}：横轴 ${xm.label}，纵轴 ${ym.label}`);
- if(!points.length){el(svg,'text',{x:width/2,y:height/2,'text-anchor':'middle',fill:'#656c80','font-size':14},rows.length?'当前指标没有可用数据':'请选择至少一个模型');return;}
+ svg.setAttribute('aria-label',t('Track {track} · {view}；横轴 {x}；纵轴 {y}',{track,view:t(trajectory?'候选过程':'最终结果'),x:xm.label,y:ym.label}));
+ if(!points.length){el(svg,'text',{x:width/2,y:height/2,'text-anchor':'middle',fill:'#656c80','font-size':14},t(rows.length?'当前指标没有可用数据':'请选择至少一个模型'));return;}
  const xlog=choice.xs==='log',ylog=choice.ys==='log',tickCount=width<560?3:5,xd=axisDomain(points.map(p=>p.x),xlog,xm.integer,tickCount),yd=axisDomain(points.map(p=>p.y),ylog,ym.integer,tickCount);
  const left=64,right=width-23,top=20,bottom=height-62,sx=x=>left+xd.ratio(x)*(right-left),sy=y=>bottom-yd.ratio(y)*(bottom-top);
  const precision=(domain,metric)=>{if(metric.decimals==null)return undefined;const gaps=domain.ticks.slice(1).map((t,i)=>Math.abs(t.value-domain.ticks[i].value));return Math.min(8,Math.max(metric.decimals,Math.ceil(-Math.log10(Math.min(...gaps)||1))));};
@@ -222,14 +255,14 @@ function drawPlot(rows){
  yd.ticks.forEach(t=>{const y=bottom-t.fraction*(bottom-top);el(svg,'line',{x1:left,x2:right,y1:y,y2:y,stroke:'#e9eaf1'});el(svg,'text',{x:left-10,y:y+4,'text-anchor':'end',fill:'#656c80','font-size':11,class:'y-tick'},tick(t.value,ym.integer,precision(yd,ym)));});
  xd.ticks.forEach(t=>{const x=left+t.fraction*(right-left);el(svg,'line',{x1:x,x2:x,y1:top,y2:bottom,stroke:'#f0f1f6'});el(svg,'text',{x,y:bottom+22,'text-anchor':'middle',fill:'#656c80','font-size':11,class:'x-tick'},tick(t.value,xm.integer,precision(xd,xm)));});
  el(svg,'line',{x1:left,x2:right,y1:bottom,y2:bottom,stroke:'#c8ccda'});
- el(svg,'text',{x:(left+right)/2,y:height-10,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'x-label'},xm.label+(xlog?' · 对数':''));
- el(svg,'text',{x:16,y:(top+bottom)/2,transform:`rotate(-90 16 ${(top+bottom)/2})`,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'y-label'},ym.label+(ylog?' · 对数':''));
+ el(svg,'text',{x:(left+right)/2,y:height-10,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'x-label'},xm.label+(xlog?' · '+t('对数'):''));
+ el(svg,'text',{x:16,y:(top+bottom)/2,transform:`rotate(-90 16 ${(top+bottom)/2})`,'text-anchor':'middle',fill:'#656c80','font-size':12,class:'y-label'},ym.label+(ylog?' · '+t('对数'):''));
  if(connected)rows.forEach(r=>{
   const ps=points.filter(p=>p.row===r);
   if(ps.length>1)el(svg,'polyline',{points:ps.map(p=>`${sx(p.x)},${sy(p.y)}`).join(' '),fill:'none',stroke:defs[r.model][1],'stroke-width':2.1,opacity:.85});
  });
  points.forEach(p=>{
-  const r=p.row,stage=p.candidate?` · 提交 ${p.candidate.index}${p.candidate.final?' · 最终候选':''}`:' · 最终结果';
+  const r=p.row,stage=p.candidate?` · ${t('提交 {index}',{index:p.candidate.index})}${p.candidate.final?' · '+t('最终候选'):''}`:' · '+t('最终结果');
   const label=`${defs[r.model][0]} · Track ${r.track}${stage} ｜ ${xm.label}：${fmt(p.x,xm.integer?0:6)} ｜ ${ym.label}：${fmt(p.y,ym.integer?0:6)}`;
   const circle=el(svg,'circle',{cx:sx(p.x),cy:sy(p.y),r:!p.candidate||p.candidate.final?6:4.8,fill:defs[r.model][1],stroke:'white','stroke-width':1.5,tabindex:0,class:'chart-point','aria-label':label,'data-model-id':r.model,'data-x':p.x,'data-y':p.y});
   p.circle=circle;p.cx=sx(p.x);p.cy=sy(p.y);plottedPoints.push(p);
@@ -241,13 +274,14 @@ function drawPlot(rows){
 function render(){
  document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===track)));
  document.querySelectorAll('[data-model]').forEach(b=>b.setAttribute('aria-pressed',String(visible.has(b.dataset.model))));
- $('#track-desc').textContent=track==='A'?'最多 8 小时研究墙钟；可多次实验和开租约。':'最多 6 个训练租约，每次最多 1 小时。';
- $('#table-title').textContent=`Track ${track} · 最终结果`;
+ $('#track-desc').textContent=t(track==='A'?'最多 8 小时研究墙钟；可多次实验和开租约。':'最多 6 个训练租约，每次最多 1 小时。');
+ $('#table-title').textContent=t('Track {track} · 最终结果',{track});
  const rows=D.rows.filter(r=>r.track===track&&visible.has(r.model)).sort((a,b)=>(a.test_nll??Infinity)-(b.test_nll??Infinity));
  drawPlot(rows);
- $('#results').innerHTML=rows.length?rows.map(r=>`<tr><td><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])}</td><td class="num">${fmt(r.test_nll)}</td><td class="num">${fmt(r.score,2)}</td><td class="num">${fmt(r.seconds_per_task,6)}</td><td class="num">${fmt(r.lease_hours,2)}</td><td>${r.candidates}</td><td class="num">${fmt(r.first_analysis,3)} → ${fmt(r.final_analysis,3)}</td></tr>`).join(''):'<tr><td colspan="7">请选择模型。</td></tr>';
- $('#pairs').innerHTML=models.filter(m=>visible.has(m)).map(m=>{const a=D.rows.find(r=>r.model===m&&r.track==='A'),b=D.rows.find(r=>r.model===m&&r.track==='B'),diff=a?.test_nll!=null&&b?.test_nll!=null?b.test_nll-a.test_nll:null;return `<tr><td>${esc(defs[m][0])}</td><td class="num">${fmt(a?.test_nll)}</td><td class="num">${fmt(b?.test_nll)}</td><td class="num" style="color:${diff<0?'var(--green)':'var(--orange)'}">${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${diff==null?'未完成':diff<0?'B':diff>0?'A':'相同'}</td></tr>`}).join('')||'<tr><td colspan="5">请选择模型。</td></tr>';
+ $('#results').innerHTML=rows.length?rows.map(r=>`<tr><td><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])}</td><td class="num">${fmt(r.test_nll)}</td><td class="num">${fmt(r.score,2)}</td><td class="num">${fmt(r.seconds_per_task,6)}</td><td class="num">${fmt(r.lease_hours,2)}</td><td>${r.candidates}</td><td class="num">${fmt(r.first_analysis,3)} → ${fmt(r.final_analysis,3)}</td></tr>`).join(''):`<tr><td colspan="7">${t('请选择模型。')}</td></tr>`;
+ $('#pairs').innerHTML=models.filter(m=>visible.has(m)).map(m=>{const a=D.rows.find(r=>r.model===m&&r.track==='A'),b=D.rows.find(r=>r.model===m&&r.track==='B'),diff=a?.test_nll!=null&&b?.test_nll!=null?b.test_nll-a.test_nll:null;return `<tr><td>${esc(defs[m][0])}</td><td class="num">${fmt(a?.test_nll)}</td><td class="num">${fmt(b?.test_nll)}</td><td class="num" style="color:${diff<0?'var(--green)':'var(--orange)'}">${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${diff==null?t('未完成'):diff<0?'B':diff>0?'A':t('相同')}</td></tr>`}).join('')||`<tr><td colspan="5">${t('请选择模型。')}</td></tr>`;
 }
+applyLanguage();
 fillAxes();
 render();
 let resizeFrame;window.addEventListener('resize',()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(render);});
