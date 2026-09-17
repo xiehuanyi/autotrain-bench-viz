@@ -1,58 +1,82 @@
-# AutoTrain-Bench visualizations
+# AutoTrain Visualization and Analysis Skill
 
-- [RSI / meta-learning dashboard](https://xiehuanyi.github.io/autotrain-bench-viz/):
-  the latest selected single-H200 Track A/B campaign, with model filters,
-  a single configurable chart and paired tables. Select candidate history or
-  final results, choose either axis, swap axes, and use linear/log scales.
-  Both views expose Score, NLL, perplexity, inference latency, evaluation time
-  and throughput. Time, candidate/lease counts, improvements and Agent token
-  usage are also available where recorded. Both views default to Score versus
-  seconds per task (s/task). The initial data view is Final · TEST.
-  A cursor-following tooltip shows full metrics on hover near a point; touch
-  users can tap, and keyboard users can focus a point (Escape dismisses).
-  Candidate metrics come from their own postmortem ANALYSIS evaluations;
-  final metrics come from TEST. Perplexity is derived as exp(mean NLL).
-  `Seconds per task (s/task)` uses the original `time_per_task` values, matching
-  the earlier viewer. It is available on either axis in both views and is the
-  default cost axis. The separate millisecond option remains available.
+A portable static dashboard, an English analysis skill, and a reproducible worked example for AutoTrain-Bench results. Run the website locally without a GitHub account, token, backend, or frontend package installation. GitHub hosting is optional.
 
-Only the latest selected H200 campaign is displayed. Older experiment pages
-have been removed from the published site. `/rsi/` is an alias of the homepage.
+## Run locally
 
-## Languages
-
-Use the **中文 / English** switch in the header. Navigation, chart metrics,
-tooltips, tables, explanatory notes, and accessibility labels switch together.
-Changing language preserves the selected track, models, axes, and data view.
-The choice is saved locally. `?lang=en` and `?lang=zh` provide direct links and
-override the saved preference; otherwise the browser language is used initially.
-Translation strings are maintained in `tools/translations.json` and embedded
-in the generated HTML, so both languages also work offline.
-
-## Rebuild the RSI dashboard
-
-Python 3 standard library only; no installation or browser-side dependencies.
-The public aggregate JSON is committed so anyone can reproduce the page:
+Requirements: Python 3.9+ for the dashboard. Clone or download this repository, then run:
 
 ```sh
+git clone https://github.com/xiehuanyi/autotrain-bench-viz.git
+cd autotrain-bench-viz
+python3 tools/build_rsi.py --output-dir dist
+python3 -m http.server 8000 --bind 127.0.0.1 --directory dist
+```
+
+Open **http://127.0.0.1:8000/?lang=en**. Stop the server with Ctrl+C. The generated `dist/index.html` embeds its data and translations and can also be opened directly without a server. Copy the entire `dist/` directory when sharing the static site, including its downloadable JSON.
+
+The dashboard includes model filters, configurable axes, linear/log scales, Candidate ANALYSIS trajectories, final TEST results, detailed point tooltips, and paired Track A/B tables. Its initial view is final TEST score versus seconds per task. Use the language switch or `?lang=en` / `?lang=zh`; switching languages preserves chart selections.
+
+The committed data is the previously published H200 preview campaign. It is not the synthetic worked example below and is not a formal leaderboard. The dashboard shows submitted-Candidate observations; it does not implement the analysis skill's complete incumbent/oracle reconstruction or input-admission checks.
+
+## English analysis skill
+
+The [autotrain-analysis skill](skills/autotrain-analysis/SKILL.md) follows Liangyu Wang's [research-dynamics design](https://github.com/liangyuwang/AutoTrain-Bench/blob/811d6a559270e4b4ea838aba1224dc330b62fb97/docs/research-dynamics.md). It covers:
+
+- Input admission, historical result compatibility, provenance, and coverage.
+- Submitted, incumbent, and observed-oracle curves, with distinct Track A/B budgets.
+- Target attainment, missing-data handling, selection gaps, and serving cost.
+- Process evidence for improvements and reuse, with explicit limits on RSI claims.
+
+To install, copy the **entire** `skills/autotrain-analysis/` directory into your Codex skills directory (`$CODEX_HOME/skills`, or `~/.codex/skills` by default). Keep its `references/` and `agents/` subdirectories. If a skill with that name is already installed, compare it before replacing it.
+
+Then ask:
+
+> Use $autotrain-analysis to analyze completed episodes in my AutoTrain project and produce an auditable English report.
+
+The skill is a workflow, not a bundled production `bench_analysis` package. It can guide an agent in writing the read-only analysis needed for a task. It does not launch training or rerun hidden evaluations.
+
+## Worked demo
+
+Read the [English demo report](examples/research-dynamics/report/report.md) or inspect the [numerical results](examples/research-dynamics/report/analysis.json). **Every number and process note in this example is synthetic.** It demonstrates an undeclared better Candidate, a regression, repeated declarations, missing evaluation, and ambiguous first attainment.
+
+![Synthetic Track A/B analysis example](examples/research-dynamics/report/curves.png)
+
+The [source fixture](examples/research-dynamics/fixtures/demo.json), configuration, computation script, CSV, evidence records, and figures are included. To regenerate with Python 3.12+:
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements-demo.txt
+.venv/bin/python examples/research-dynamics/build_demo.py
+```
+
+On Windows, use `.venv\Scripts\python.exe` instead of `.venv/bin/python`. Matplotlib is needed only to regenerate these figures; reading the example or running the website needs no installation. The demo script accepts only its invented schema and is not a real-episode loader.
+
+## Rebuild or adapt the dashboard
+
+```sh
+# Reproduce the committed root pages from public aggregates:
 python3 tools/build_rsi.py
+
+# Build a separate static directory:
+python3 tools/build_rsi.py --output-dir dist
+
+# Export a compatible trusted viewer snapshot to a separate directory:
+python3 tools/build_rsi.py --snapshot /path/to/viewer/data.json --output-dir dist
 ```
 
-To update it from a new trusted `atb_viz` snapshot:
+The exporter selects numeric results, model identifiers, Candidate history, and public metadata. It checks selected data/evaluator identity fields for completed runs; this is not the full admission or comparison validation in the skill. Raw transcripts, commands, workspace text, and credentials are not included in the exported fields. Review publication permissions and the generated aggregate before hosting it.
 
-```sh
-python3 tools/build_rsi.py --snapshot /path/to/viewer/data.json
-```
+The current dashboard template and exporter describe the included single-H200 campaign, including its known model list, budgets, and editorial notes. For another campaign, adapt the exporter, model definitions, narrative, and translations together instead of presenting the old explanatory text as findings about new runs. See [the code and data guide](docs/project-layout.md).
 
-The exporter checks completed-run data/evaluator identities and selects only
-model identifiers, numeric results, candidate trajectories and public metadata.
-It does not export raw transcripts, commands, workspace text, private paths,
-or credentials. The HTML embeds `rsi/data.json` and works offline.
+## Optional hosting
 
-Source: `tools/build_rsi.py`, `tools/rsi-template.html`, and `tools/translations.json`.
-GitHub Pages serves `main` from the repository root. Commit and push generated
-`index.html`, `rsi/index.html` and `rsi/data.json` to publish; this is a snapshot, not a live monitor.
+Any static host can serve `dist/`. You can keep using it locally without enabling GitHub Pages.
 
-A/B both allow adaptation and have different budgets. Candidate ANALYSIS is
-computed after research ends, not provided to the Agent during research.
-Observed improvements and A/B differences are not causal RSI effect estimates.
+For your own GitHub site, see [deployment instructions](docs/deployment.md). An [inactive, manual Pages workflow template](deploy/github-pages.yml.example) is included. Enable it only in a repository you control; it uses that repository's automatically issued `GITHUB_TOKEN`. No maintainer credentials are distributed or required.
+
+The original repository's [existing hosted preview](https://xiehuanyi.github.io/autotrain-bench-viz/) is a separate deployment choice. Cloning the code does not configure hosting for your account.
+
+## Interpretation
+
+A and B both allow adaptation and use different budgets. ANALYSIS is postmortem measurement, never feedback delivered during research. Candidate count, improving curves, and A/B differences do not establish a causal RSI effect. Keep final TEST quality, Candidate serving cost, research expenditure, and coverage distinct.

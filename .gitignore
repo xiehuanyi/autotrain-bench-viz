@@ -1,0 +1,17 @@
+# Generated hosting builds and local environments
+/dist/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Keep private episode data and local credentials outside this repository.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+/private-data/
+/episodes/
+/snapshots/

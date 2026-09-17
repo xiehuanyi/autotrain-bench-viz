@@ -5,6 +5,8 @@ Refresh from a trusted viewer snapshot:
   python3 tools/build_rsi.py --snapshot /path/to/data.json
 Reproduce from the committed public aggregate data:
   python3 tools/build_rsi.py
+Build an isolated directory for local or static hosting:
+  python3 tools/build_rsi.py --output-dir dist
 
 Only explicitly selected numeric results and model identifiers are exported.
 Raw transcripts, commands, workspaces and filesystem paths are not published.
@@ -111,19 +113,20 @@ def export(snapshot):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--snapshot', type=Path)
+    parser.add_argument('--output-dir', type=Path, default=ROOT,
+                        help='Static output root (default: repository root).')
     args = parser.parse_args()
-    output = ROOT / 'rsi'
-    output.mkdir(exist_ok=True)
+    site_root = args.output_dir.resolve()
+    output = site_root / 'rsi'
     if args.snapshot:
         data = export(args.snapshot)
     else:
-        data = json.loads((output / 'data.json').read_text())
+        data = json.loads((ROOT / 'rsi' / 'data.json').read_text())
     payload = json.dumps(data, ensure_ascii=False, indent=2, allow_nan=False)
     # Catch accidental private paths before writing anything to the public site.
     for token in ['/mnt/', '/home/', '/media/', '/ibex/', 'api_key', 'Authorization', 'agent.stdout']:
         if token in payload:
             raise ValueError(f'Unexpected private information in public aggregates: {token}')
-    (output / 'data.json').write_text(payload + '\n')
     template = (ROOT / 'tools' / 'rsi-template.html').read_text()
     if template.count('__RSI_DATA__') != 1:
         raise ValueError('The template must contain exactly one data placeholder.')
@@ -132,8 +135,11 @@ def main():
     translations = json.loads((ROOT / 'tools' / 'translations.json').read_text())
     page = template.replace('__RSI_DATA__', payload.replace('<', '\\u003c'))
     page = page.replace('__I18N_DATA__', json.dumps(translations, ensure_ascii=False).replace('<', '\\u003c'))
+    output.mkdir(parents=True, exist_ok=True)
+    (output / 'data.json').write_text(payload + '\n')
     (output / 'index.html').write_text(page.replace('__DATA_URL__', 'data.json'))
-    (ROOT / 'index.html').write_text(page.replace('__DATA_URL__', 'rsi/data.json'))
+    (site_root / 'index.html').write_text(page.replace('__DATA_URL__', 'rsi/data.json'))
+    (site_root / '.nojekyll').touch()
     print(f"Built latest-only dashboard: {len(data['rows'])} runs, snapshot {data['generated_at']}")
 
 

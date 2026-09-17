@@ -1,0 +1,37 @@
+# Optional template: inactive until copied into .github/workflows/ in YOUR repo.
+# Enable GitHub Actions as the Pages source, then run this workflow manually.
+# Uses your repository's automatic GITHUB_TOKEN; no maintainer token or PAT.
+name: Deploy visualization to GitHub Pages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out this repository
+        uses: actions/checkout@v6
+      - name: Build static files
+        run: python3 tools/build_rsi.py --output-dir dist
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+      - name: Upload the static output only
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
