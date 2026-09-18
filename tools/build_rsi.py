@@ -26,14 +26,21 @@ def export(snapshot):
     episodes = source['episodes']
     complete = [e for e in episodes if e.get('test_nll') is not None]
     identity_fields = ['core_git', 'train_manifest_sha256', 'task_manifest_sha256',
-                       'challenge_manifest_sha256', 'evaluator_sha256', 'hidden_evaluation']
+                       'evaluator_sha256', 'hidden_evaluation']
     for key in identity_fields:
         identities = {json.dumps(e['artifact_identities'][key], sort_keys=True) for e in complete}
         if len(identities) != 1:
             raise ValueError(f'Mixed evaluation identities: {key}')
-    pairs = [(e['model_short'], e['track']) for e in episodes]
+    # Budget extensions have distinct challenge manifests; enforce identity within each lane.
+    lanes = {e['comparison_key']['track_config'] for e in complete}
+    for lane in lanes:
+        hashes = {e['artifact_identities']['challenge_manifest_sha256'] for e in complete
+                  if e['comparison_key']['track_config'] == lane}
+        if len(hashes) != 1:
+            raise ValueError(f'Mixed challenge identities within {lane}')
+    pairs = [(e['model_short'], e['track'], e['comparison_key']['track_config']) for e in episodes]
     if len(set(pairs)) != len(pairs):
-        raise ValueError('Select one authorized attempt per model and track before exporting.')
+        raise ValueError('Select one authorized attempt per model and Track configuration before exporting.')
     rows = []
     for e in episodes:
         candidates = {c['id']: c for c in e['candidates']}
@@ -76,6 +83,10 @@ def export(snapshot):
             budget_seconds = budget['max_leases'] * budget['lease_seconds']
         rows.append({
             'model': e['model_short'], 'track': e['track'],
+            'track_config': e['comparison_key']['track_config'],
+            'comparison_key': e['comparison_key'],
+            'challenge_manifest_sha256': e['artifact_identities']['challenge_manifest_sha256'],
+            'max_leases': budget.get('max_leases'),
             'status': e['status'], 'outcome': e.get('outcome'),
             'test_nll': e.get('test_nll'), 'score': e.get('test_score'),
             'seconds_per_task': ms,
@@ -97,11 +108,11 @@ def export(snapshot):
             'agent_turns': (e.get('transcript_summary') or {}).get('turns'),
         })
     return {
-        'schema_version': 2, 'generated_at': source['generated_at'],
+        'schema_version': 3, 'generated_at': source['generated_at'],
         'source_sha256': hashlib.sha256(raw).hexdigest(),
         'core_revision': complete[0]['repo_commit'] if complete else None,
         'runtime': '1 × NVIDIA H200 SXM 141GB', 'task': 'lm-pretrain',
-        'selection': 'Latest authorized attempt per model/track; previous failed attempts excluded.',
+        'selection': 'Latest authorized attempt per model/Track configuration; B6 and B12 retained separately; previous failed attempts excluded.',
         'excluded_attempts': [
             {'model': v['model'], 'track': v['track'], 'outcome': v['outcome']}
             for v in source.get('excluded_attempts', [])

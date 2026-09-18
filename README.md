@@ -17,7 +17,9 @@ Open **http://127.0.0.1:8000/?lang=en**. Stop the server with Ctrl+C. The genera
 
 The dashboard includes model filters, configurable axes, linear/log scales, Candidate ANALYSIS trajectories, final TEST results, detailed point tooltips, and paired Track A/B tables. Its initial view is final TEST score versus seconds per task. Use the language switch or `?lang=en` / `?lang=zh`; switching languages preserves chart selections.
 
-The committed data is the previously published H200 preview campaign. It is not the synthetic worked example below and is not a formal leaderboard. The dashboard shows submitted-Candidate observations; it does not implement the analysis skill's complete incumbent/oracle reconstruction or input-admission checks.
+The committed data contains 24 completed H200 preview runs: 11 A8, 11 B6, and two B12 extensions (Fable 5.1 and Astra). B12 is the initial view; budget configurations remain separate in charts, with an additional B6/B12 comparison table. The B12 challenge manifest differs only by its added budget configuration; task, data, evaluator and Core identities are retained.
+
+The data is the H200 preview campaign. It is not the synthetic worked example below and is not a formal leaderboard. The dashboard shows submitted-Candidate observations; it does not implement the analysis skill's complete incumbent/oracle reconstruction or input-admission checks.
 
 ## English analysis skill
 

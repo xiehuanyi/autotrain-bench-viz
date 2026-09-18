@@ -21,9 +21,9 @@
 <header><nav class="nav" aria-label="页面导航"><a class="brand" href="#">AutoTrain-Bench</a><a class="active" href="#" aria-current="page">RSI 分析</a><a href="#table-title">最新实验结果</a><div class="grow"></div><a href="https://github.com/xiehuanyi/autotrain-bench-viz/tree/main/tools">可视化脚本 ↗</a><div class="seg language-switch" role="group" aria-label="页面语言"><button type="button" data-lang="zh" lang="zh-CN" aria-pressed="true">中文</button><button type="button" data-lang="en" lang="en" aria-pressed="false">English</button></div></nav></header>
 <main class="wrap">
 <div class="intro"><div class="eyebrow">Research notes / H200 experiments</div><h1>从实验中学习，模型做得如何？</h1><p class="muted">把 RSI 看作 meta-learning：内层训练语言模型，外层根据实验反馈调整方法。一起看最终质量、候选轨迹，以及每次改进花掉的预算。</p><div class="stamp" id="stamp"></div></div>
-<section class="stats" aria-label="实验概况"><div class="stat"><div class="value" id="model-count"></div><div class="label">研究模型</div></div><div class="stat"><div class="value" id="complete-count"></div><div class="label">已完成实验</div></div><div class="stat"><div class="value">8 h / 6 × 1 h</div><div class="label">Track A / Track B 预算上限</div></div><div class="stat"><div class="value">1 × H200</div><div class="label">相同任务、数据及评估器</div></div></section>
+<section class="stats" aria-label="实验概况"><div class="stat"><div class="value" id="model-count"></div><div class="label">研究模型</div></div><div class="stat"><div class="value" id="complete-count"></div><div class="label">已完成实验</div></div><div class="stat"><div class="value" style="font-size:18px">A: 8 h<br>B: 6 / 12 × 1 h</div><div class="label">Track A / Track B 预算上限</div></div><div class="stat"><div class="value">1 × H200</div><div class="label">相同任务、数据及评估器</div></div></section>
 <div class="notice"><strong>如何解读：</strong>A 与 B 都允许自我改进，预算规则不同。这里展示观察结果，尚无同预算 RSI-off 对照。ANALYSIS 分数在研究结束后计算，并不是 Agent 当时获得的反馈。</div>
-<section class="panel" aria-labelledby="filter-title"><h2 id="filter-title">选择比较范围</h2><div class="filters"><div class="seg" aria-label="选择 Track"><button data-track="B" aria-pressed="true">Track B</button><button data-track="A" aria-pressed="false">Track A</button></div><span id="track-desc" class="hint"></span><span class="grow"></span><button id="all" class="smallbutton">全部模型</button><button id="leading" class="smallbutton">聚焦主要模型</button></div><div class="legend" id="legend" aria-label="筛选模型"></div><p class="caption">点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。</p></section>
+<section class="panel" aria-labelledby="filter-title"><h2 id="filter-title">选择比较范围</h2><div class="filters"><div class="seg" aria-label="选择 Track"><button data-track="B12" aria-pressed="true">Track B · 12</button><button data-track="B6" aria-pressed="false">Track B · 6</button><button data-track="A" aria-pressed="false">Track A · 8 h</button></div><span id="track-desc" class="hint"></span><span class="grow"></span><button id="all" class="smallbutton">全部模型</button><button id="leading" class="smallbutton">聚焦主要模型</button></div><div class="legend" id="legend" aria-label="筛选模型"></div><p class="caption">点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。</p></section>
 <section class="panel plot-panel" aria-labelledby="plot-title">
 <h2 id="plot-title">自定义比较图</h2><p class="hint">横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。</p>
 <div class="plot-presets" aria-label="常用指标组合"><button type="button" class="smallbutton" data-preset="score-time">Score × 时间</button><button type="button" class="smallbutton" data-preset="nll-time">NLL × 时间</button><button type="button" class="smallbutton" data-preset="score-cost">Score × s/task</button></div>
@@ -38,20 +38,21 @@
 <p class="caption" id="plot-caption"></p>
 </section>
 <section class="panel"><div class="chartheading"><div><h2 id="table-title">Track B · 最终结果</h2><p class="hint">按 NLL 升序排列；提交候选数与元学习次数不同。</p></div><a class="smallbutton" href="data.json" download>下载汇总 JSON</a></div><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">TEST NLL ↓</th><th scope="col">Score ↑</th><th scope="col">s/task ↓</th><th scope="col">租约小时</th><th scope="col">候选数</th><th scope="col">ANALYSIS 首 → 末</th></tr></thead><tbody id="results"></tbody></table></div><p class="caption">s/task 为每条任务的推理秒数（1 s = 1000 ms）。Score 与 NLL 来自同一个质量指标。租约小时包含运行环境内的全部占用，不等于纯 GPU 计算时间。</p></section>
-<section class="panel"><h2>同一模型在两种预算下的结果</h2><p class="hint">这是一组描述性配对，不合并成同一预算下的排名。</p><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">A · TEST NLL</th><th scope="col">B · TEST NLL</th><th scope="col">B − A</th><th scope="col">较低 NLL</th></tr></thead><tbody id="pairs"></tbody></table></div><p class="caption">负值表示本次 B 的 NLL 更低。结果同时受初始配方、实际训练量、推理配置和随机性影响，差值不等于 RSI 增益。</p></section>
-<section class="panel"><div class="eyebrow">Reading the evidence</div><h2 style="margin-top:8px">三个值得保留的判断</h2><div class="evidence"><article><div class="tag">01 / 方法改进</div><h3>Fable / Opus：完整的反馈闭环</h3><p>A 组都通过测量瓶颈，把训练吞吐提升到约 2.1 倍。Opus 还调整不稳定的训练策略，并放弃实测无收益的权重平均。B 组两者只差 0.00031 NLL，单次实验不足以区分优劣。</p></article><article><div class="tag">02 / 诊断与取舍</div><h3>Astra / Kimi：不同的适应能力</h3><p>Astra 比较上下文长度与校准方案，在 B 组获得最低的推理耗时点估计。Kimi 在更换验证样本后，把旧、新候选放到相同样本上重测，避免把测量变化误判为进步。</p></article><article><div class="tag">03 / 归因边界</div><h3>首末涨幅需要结合起点</h3><p>早期保险候选、错误修复、更多梯度训练和方法更新，都可能拉大首末差值。Flash B 到第 5 租约才提交首候选，不能与从第 1 租约开始提交的曲线直接比较涨幅。</p></article></div><details><summary>其余模型的过程证据</summary><ul class="note-list"><li>DeepSeek Flash：B 的高吞吐配方与持续训练获得优秀终点；A 的退火与低学习率续训也改善了自评与候选结果。</li><li>GLM：通过 profiling、CUDA graphs 与位置表示调整提高吞吐；实现收益没有全部转化成最优质量。</li><li>Sonnet：B 修复逐元素输出检查瓶颈，本地 1000 样本耗时约 25 s → 3.4 s；A 的自评未充分覆盖最终表现。</li><li>Sol：B 候选稳定改善，主要沿相同配方续训；方法层改进的独立贡献尚未识别。</li><li>DeepSeek Pro：两轨初始配方、搜索成本和最终结果差异较大。</li><li>Terra / Luna：错误修复、验证覆盖和预算分配仍限制结果；大幅下降不能自动归因于更强元学习。</li></ul></details></section>
-<section class="panel"><h2>数据口径与复现</h2><ul class="note-list"><li>每个模型／Track 采用最新授权尝试。GLM B 与 Flash A 的旧失败尝试单独排除。</li><li>本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。</li><li>A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。</li><li>页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。</li></ul><details><summary>查看数据身份</summary><p id="provenance" style="overflow-wrap:anywhere;margin-top:12px"></p></details></section>
+<section class="panel"><h2>B6 → B12：增加租约后的结果</h2><p class="hint">独立新运行，每种配置一次；差值包含训练量、策略与随机性变化，不是纯预算因果效应。</p><div class="tablewrap"><table><thead><tr><th>模型</th><th>B6 · TEST NLL</th><th>B12 · TEST NLL</th><th>B12 − B6</th><th>B12 · s/task</th><th>B12 · 租约小时</th></tr></thead><tbody id="budget-pairs"></tbody></table></div><p class="caption">第 6 → 12 次提交的 ANALYSIS：Fable 3.0291 → 2.8941；Astra 3.1706 → 3.0084。后六次仍有改善，是否来自方法创新需结合过程证据。</p></section>
+<section class="panel"><h2>同一模型：A8 与 B6</h2><p class="hint">这是一组描述性配对，不合并成同一预算下的排名。</p><div class="tablewrap"><table><thead><tr><th scope="col">模型</th><th scope="col">A · TEST NLL</th><th scope="col">B6 · TEST NLL</th><th scope="col">B6 − A</th><th scope="col">较低 NLL</th></tr></thead><tbody id="pairs"></tbody></table></div><p class="caption">负值表示本次 B 的 NLL 更低。结果同时受初始配方、实际训练量、推理配置和随机性影响，差值不等于 RSI 增益。</p></section>
+<section class="panel"><div class="eyebrow">Reading the evidence</div><h2 style="margin-top:8px">三个值得保留的判断</h2><div class="evidence"><article><div class="tag">01 / 方法改进</div><h3>Fable / Opus：完整的反馈闭环</h3><p>A 组通过测量瓶颈改善吞吐，最终加速也包含模型配置变化。Opus 还调整不稳定的训练策略，并放弃实测无收益的权重平均。B6 组两者只差 0.00031 NLL，单次实验不足以区分优劣。</p></article><article><div class="tag">02 / 诊断与取舍</div><h3>Astra / Kimi：不同的适应能力</h3><p>Astra 比较上下文长度与校准方案，在 B6 组获得最低的推理耗时点估计。Kimi 在更换验证样本后，把旧、新候选放到相同样本上重测，避免把测量变化误判为进步。</p></article><article><div class="tag">03 / 归因边界</div><h3>首末涨幅需要结合起点</h3><p>早期保险候选、错误修复、更多梯度训练和方法更新，都可能拉大首末差值。Flash B 到第 5 租约才提交首候选，不能与从第 1 租约开始提交的曲线直接比较涨幅。</p></article></div><details><summary>其余模型的过程证据</summary><ul class="note-list"><li>DeepSeek Flash：B 的高吞吐配方与持续训练获得优秀终点；A 的退火与低学习率续训也改善了自评与候选结果。</li><li>GLM：通过 profiling、CUDA graphs 与位置表示调整提高吞吐；实现收益没有全部转化成最优质量。</li><li>Sonnet：B 修复逐元素输出检查瓶颈，本地 1000 样本耗时约 25 s → 3.4 s；A 的自评未充分覆盖最终表现。</li><li>Sol：B 候选稳定改善，主要沿相同配方续训；方法层改进的独立贡献尚未识别。</li><li>DeepSeek Pro：两轨初始配方、搜索成本和最终结果差异较大。</li><li>Terra / Luna：错误修复、验证覆盖和预算分配仍限制结果；大幅下降不能自动归因于更强元学习。</li></ul></details></section>
+<section class="panel"><h2>数据口径与复现</h2><ul class="note-list"><li>每个模型／Track 配置采用最新授权尝试。A8、B6、B12 分开保留；新增 B12 仅覆盖 Fable 与 Astra。GLM B6 与 Flash A 的旧失败尝试单独排除。</li><li>本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。</li><li>A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。</li><li>页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。</li></ul><details><summary>查看数据身份</summary><p id="provenance" style="overflow-wrap:anywhere;margin-top:12px"></p></details></section>
 <footer><span>AutoTrain · RSI as meta-learning</span><a href="https://github.com/xiehuanyi/autotrain-bench-viz/blob/main/tools/build_rsi.py">构建脚本</a><a href="https://github.com/xiehuanyi/autotrain-bench-viz/blob/main/tools/rsi-template.html">页面模板</a><a href="https://arxiv.org/abs/2303.11366">Reflexion</a><a href="https://arxiv.org/abs/2210.14215">Algorithm Distillation</a></footer>
 </main>
 <div id="graph-tooltip" class="graph-tooltip" role="tooltip" hidden></div>
 <script type="application/json" id="rsi-data">{
-  "schema_version": 2,
-  "generated_at": "2026-09-16T07:47:25+00:00",
-  "source_sha256": "87acb7060b12878c170c8e7688fe673998af784b41207fedaa0b26e803e777b0",
+  "schema_version": 3,
+  "generated_at": "2026-09-18T17:51:45+00:00",
+  "source_sha256": "13a82a7aa832fbd4084c296d247028cc5f9f4719ef0f627f8b58e903b171f71f",
   "core_revision": "7a044a156c37bc1febd823344d6e6c97ff083019",
   "runtime": "1 × NVIDIA H200 SXM 141GB",
   "task": "lm-pretrain",
-  "selection": "Latest authorized attempt per model/track; previous failed attempts excluded.",
+  "selection": "Latest authorized attempt per model/Track configuration; B6 and B12 retained separately; previous failed attempts excluded.",
   "excluded_attempts": [
     {
       "model": "glm-5.3",
@@ -69,6 +70,15 @@
     {
       "model": "gpt-5.6-luna",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 6.359444763140411,
@@ -132,6 +142,15 @@
     {
       "model": "gpt-5.6-terra",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.788062542227833,
@@ -178,6 +197,15 @@
     {
       "model": "gpt-5.6-sol",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.229495537606164,
@@ -309,6 +337,15 @@
     {
       "model": "claude-sonnet-5",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.134502695392341,
@@ -355,6 +392,15 @@
     {
       "model": "claude-opus-5",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.017565853133928,
@@ -418,6 +464,15 @@
     {
       "model": "deepseek-v4-flash",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.058128111567686,
@@ -481,6 +536,15 @@
     {
       "model": "deepseek-v4-pro",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.438659371901475,
@@ -527,6 +591,15 @@
     {
       "model": "kimi-k3",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.0364002220492186,
@@ -658,6 +731,15 @@
     {
       "model": "glm-5.3",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.149064944548225,
@@ -738,6 +820,15 @@
     {
       "model": "gpt-6-astra",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 2.986191461153635,
@@ -784,6 +875,15 @@
     {
       "model": "claude-fable-5-1",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 2.88529248349031,
@@ -847,6 +947,15 @@
     {
       "model": "gpt-6-astra",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.122259727831594,
@@ -978,6 +1087,15 @@
     {
       "model": "claude-fable-5-1",
       "track": "B",
+      "track_config": "preview-b-6x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-6x1h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": 6,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.017252226719791,
@@ -1092,6 +1210,15 @@
     {
       "model": "kimi-k3",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.161392606646895,
@@ -1172,6 +1299,15 @@
     {
       "model": "glm-5.3",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.247955036400625,
@@ -1218,6 +1354,15 @@
     {
       "model": "gpt-5.6-luna",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.7066179119344222,
@@ -1264,6 +1409,15 @@
     {
       "model": "gpt-5.6-terra",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.64037417043656,
@@ -1310,6 +1464,15 @@
     {
       "model": "gpt-5.6-sol",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.153931641503035,
@@ -1356,6 +1519,15 @@
     {
       "model": "claude-sonnet-5",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.4941142968437533,
@@ -1402,6 +1574,15 @@
     {
       "model": "claude-opus-5",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 2.916379053399159,
@@ -1465,6 +1646,15 @@
     {
       "model": "deepseek-v4-pro",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.1074060893991597,
@@ -1562,6 +1752,15 @@
     {
       "model": "deepseek-v4-flash",
       "track": "A",
+      "track_config": "preview-a-8h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "A",
+        "track_config": "preview-a-8h"
+      },
+      "challenge_manifest_sha256": "a1940190ba00d0290dd7d6e39e330864fc8ddd36e4ffd47c7c0dd1c1e23d9b84",
+      "max_leases": null,
       "status": "finalized",
       "outcome": "success",
       "test_nll": 3.0783356460307036,
@@ -1638,10 +1837,494 @@
       "output_tokens": 18937,
       "total_tokens": 5574220,
       "agent_turns": 86
+    },
+    {
+      "model": "gpt-6-astra",
+      "track": "B",
+      "track_config": "preview-b-12x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-12x1h"
+      },
+      "challenge_manifest_sha256": "051cc6cf3861ea4939ed2ff4632449af93aa764c7e2e4b83b870aaad04b945bc",
+      "max_leases": 12,
+      "status": "finalized",
+      "outcome": "success",
+      "test_nll": 2.9798472947759014,
+      "score": 72.47230103336082,
+      "seconds_per_task": 0.005764507180629153,
+      "ms": 5.764507180629153,
+      "ppl": 19.684810441846935,
+      "evaluation_seconds": 11.805710705928504,
+      "tasks_per_second": 173.4753672196584,
+      "input_tokens_per_second": 116477.86687754939,
+      "task_count": 2048,
+      "budget_hours": 12.0,
+      "lease_hours": 11.583489100555555,
+      "research_hours": 11.71038553888889,
+      "leases": 12,
+      "candidates": 12,
+      "first_analysis": 3.5047896327052794,
+      "final_analysis": 3.0083542582488505,
+      "reasoning_effort": "provider-default",
+      "points": [
+        {
+          "index": 1,
+          "candidate_id": "7490e13edb12",
+          "lease": "lease-0001",
+          "hours": 0.9729784102777778,
+          "research_hours": 0.9817937838888888,
+          "nll": 3.5047896327052794,
+          "score": 67.62290667724821,
+          "ppl": 33.274443261469635,
+          "seconds_per_task": 0.0056132210200985355,
+          "ms": 5.6132210200985355,
+          "evaluation_seconds": 11.4958766491618,
+          "tasks_per_second": 178.15083290314584,
+          "input_tokens_per_second": 119617.14986740598,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 2,
+          "candidate_id": "2fb9d0a5cb99",
+          "lease": "lease-0002",
+          "hours": 1.9324687005555556,
+          "research_hours": 1.9506840449999998,
+          "nll": 3.3595027244865596,
+          "score": 68.96506078032934,
+          "ppl": 28.774878278514546,
+          "seconds_per_task": 0.005895656113352743,
+          "ms": 5.895656113352743,
+          "evaluation_seconds": 12.074303720146418,
+          "tasks_per_second": 169.61640583736826,
+          "input_tokens_per_second": 113886.81549442794,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 3,
+          "candidate_id": "c3c16a364a4f",
+          "lease": "lease-0003",
+          "hours": 2.8925760422222226,
+          "research_hours": 2.917775905555555,
+          "nll": 3.257579779839019,
+          "score": 69.90662048473759,
+          "ppl": 25.986567758165307,
+          "seconds_per_task": 0.005554823182706059,
+          "ms": 5.554823182706059,
+          "evaluation_seconds": 11.376277878182009,
+          "tasks_per_second": 180.0237320088459,
+          "input_tokens_per_second": 120874.68456068946,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 4,
+          "candidate_id": "9f6be959921c",
+          "lease": "lease-0004",
+          "hours": 3.8526311205555555,
+          "research_hours": 3.8888481061111113,
+          "nll": 3.2209011296548034,
+          "score": 70.24545625076621,
+          "ppl": 25.05068392754073,
+          "seconds_per_task": 0.00560117136228655,
+          "ms": 5.60117136228655,
+          "evaluation_seconds": 11.471198949962854,
+          "tasks_per_second": 178.5340842690756,
+          "input_tokens_per_second": 119874.47920641745,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 5,
+          "candidate_id": "e9a45d944016",
+          "lease": "lease-0005",
+          "hours": 4.813551375277778,
+          "research_hours": 4.857600954722222,
+          "nll": 3.185727039147054,
+          "score": 70.5703929603151,
+          "ppl": 24.184865359386702,
+          "seconds_per_task": 0.0056192266586094775,
+          "ms": 5.6192266586094775,
+          "evaluation_seconds": 11.50817619683221,
+          "tasks_per_second": 177.96043134651876,
+          "input_tokens_per_second": 119489.3071222282,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 6,
+          "candidate_id": "fd698b9068af",
+          "lease": "lease-0006",
+          "hours": 5.774112215,
+          "research_hours": 5.826728645555556,
+          "nll": 3.170551045326791,
+          "score": 70.71058812740846,
+          "ppl": 23.8206069746726,
+          "seconds_per_task": 0.005561238094287546,
+          "ms": 5.561238094287546,
+          "evaluation_seconds": 11.389415617100894,
+          "tasks_per_second": 179.81607387520253,
+          "input_tokens_per_second": 120735.2551025813,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 7,
+          "candidate_id": "a827cdf34b35",
+          "lease": "lease-0007",
+          "hours": 6.732917225277778,
+          "research_hours": 6.796826123055555,
+          "nll": 3.13942773509017,
+          "score": 70.99810390599922,
+          "ppl": 23.0906491088255,
+          "seconds_per_task": 0.005890129996487303,
+          "ms": 5.890129996487303,
+          "evaluation_seconds": 12.062986232805997,
+          "tasks_per_second": 169.77553986013382,
+          "input_tokens_per_second": 113993.6640448386,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 8,
+          "candidate_id": "09700d1d14b9",
+          "lease": "lease-0008",
+          "hours": 7.695833071666667,
+          "research_hours": 7.767009400277778,
+          "nll": 3.095501247949304,
+          "score": 71.4038948728033,
+          "ppl": 22.098312495735904,
+          "seconds_per_task": 0.00595213110500481,
+          "ms": 5.95213110500481,
+          "evaluation_seconds": 12.18996450304985,
+          "tasks_per_second": 168.00705198834694,
+          "input_tokens_per_second": 112806.2349694257,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 9,
+          "candidate_id": "b03e3cf163d6",
+          "lease": "lease-0009",
+          "hours": 8.670947354166668,
+          "research_hours": 8.749919761666666,
+          "nll": 3.073820335285254,
+          "score": 71.60418219564173,
+          "ppl": 21.624357367904363,
+          "seconds_per_task": 0.005795558878503471,
+          "ms": 5.795558878503471,
+          "evaluation_seconds": 11.869304583175108,
+          "tasks_per_second": 172.5459133387702,
+          "input_tokens_per_second": 115853.7966874005,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 10,
+          "candidate_id": "c67ccb5fdf3d",
+          "lease": "lease-0010",
+          "hours": 9.634433482777778,
+          "research_hours": 9.721296252777778,
+          "nll": 3.0534608980746825,
+          "score": 71.79226178604401,
+          "ppl": 21.188549081260742,
+          "seconds_per_task": 0.0060774398266403296,
+          "ms": 6.07743982664033,
+          "evaluation_seconds": 12.446596764959395,
+          "tasks_per_second": 164.54297015274773,
+          "input_tokens_per_second": 110480.32052193554,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 11,
+          "candidate_id": "3592100221cf",
+          "lease": "lease-0011",
+          "hours": 10.608175547777778,
+          "research_hours": 10.717140435833333,
+          "nll": 3.0216443582836234,
+          "score": 72.08618158893587,
+          "ppl": 20.525014427953895,
+          "seconds_per_task": 0.0053606049394829824,
+          "ms": 5.3606049394829824,
+          "evaluation_seconds": 10.978518916061148,
+          "tasks_per_second": 186.5461102411415,
+          "input_tokens_per_second": 125254.05389503643,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 12,
+          "candidate_id": "3eac602d7a2e",
+          "lease": "lease-0012",
+          "hours": 11.583489100555555,
+          "research_hours": 11.705513757222223,
+          "nll": 3.0083542582488505,
+          "score": 72.20895495173036,
+          "ppl": 20.25403956296183,
+          "seconds_per_task": 0.005480467770553332,
+          "ms": 5.480467770553332,
+          "evaluation_seconds": 11.223997994093224,
+          "tasks_per_second": 182.4661765867908,
+          "input_tokens_per_second": 122514.63344199334,
+          "task_count": 2048,
+          "final": true
+        }
+      ],
+      "reasoning_tokens": 7079,
+      "output_tokens": 14590,
+      "total_tokens": 6403698,
+      "agent_turns": 90
+    },
+    {
+      "model": "claude-fable-5-1",
+      "track": "B",
+      "track_config": "preview-b-12x1h",
+      "comparison_key": {
+        "challenge_id": "lm-pretrain",
+        "runtime_profile": "h200-sxm-141gb-x1",
+        "track": "B",
+        "track_config": "preview-b-12x1h"
+      },
+      "challenge_manifest_sha256": "051cc6cf3861ea4939ed2ff4632449af93aa764c7e2e4b83b870aaad04b945bc",
+      "max_leases": 12,
+      "status": "finalized",
+      "outcome": "success",
+      "test_nll": 2.8687905812539505,
+      "score": 73.49823809510762,
+      "seconds_per_task": 0.005295427327723701,
+      "ms": 5.295427327723701,
+      "ppl": 17.615700552981316,
+      "evaluation_seconds": 10.845035167178139,
+      "tasks_per_second": 188.84217233321212,
+      "input_tokens_per_second": 126795.71608598111,
+      "task_count": 2048,
+      "budget_hours": 12.0,
+      "lease_hours": 10.569369016666666,
+      "research_hours": 10.664261931111112,
+      "leases": 12,
+      "candidates": 12,
+      "first_analysis": 3.8086576881528513,
+      "final_analysis": 2.894117040934942,
+      "reasoning_effort": "provider-default",
+      "points": [
+        {
+          "index": 1,
+          "candidate_id": "27477d6cc81c",
+          "lease": "lease-0001",
+          "hours": 0.7952009336111111,
+          "research_hours": 0.8127404938888888,
+          "nll": 3.8086576881528513,
+          "score": 64.81578687261813,
+          "ppl": 45.08987355518571,
+          "seconds_per_task": 0.006142569972212186,
+          "ms": 6.142569972212186,
+          "evaluation_seconds": 12.579983303090557,
+          "tasks_per_second": 162.79830828526318,
+          "input_tokens_per_second": 109308.8891192864,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 2,
+          "candidate_id": "52c45a8c3ad5",
+          "lease": "lease-0002",
+          "hours": 1.688287758333333,
+          "research_hours": 1.7140195144444446,
+          "nll": 3.5593511099377015,
+          "score": 67.11887013716698,
+          "ppl": 35.140387497197786,
+          "seconds_per_task": 0.006000811380886262,
+          "ms": 6.000811380886262,
+          "evaluation_seconds": 12.289661708055064,
+          "tasks_per_second": 166.64413135616832,
+          "input_tokens_per_second": 111891.11894745726,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 3,
+          "candidate_id": "e95680128e53",
+          "lease": "lease-0003",
+          "hours": 2.6085974566666663,
+          "research_hours": 2.640416853888889,
+          "nll": 3.284571573625453,
+          "score": 69.65727147439561,
+          "ppl": 26.6975439324247,
+          "seconds_per_task": 0.005885664631819054,
+          "ms": 5.885664631819054,
+          "evaluation_seconds": 12.053841165965423,
+          "tasks_per_second": 169.90434599243125,
+          "input_tokens_per_second": 114080.14931229306,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 4,
+          "candidate_id": "8072ab436213",
+          "lease": "lease-0004",
+          "hours": 3.5185296066666667,
+          "research_hours": 3.5563300749999995,
+          "nll": 3.125570600187011,
+          "score": 71.12611551210499,
+          "ppl": 22.77288559976363,
+          "seconds_per_task": 0.005214940570340332,
+          "ms": 5.214940570340332,
+          "evaluation_seconds": 10.680198288057,
+          "tasks_per_second": 191.756739412802,
+          "input_tokens_per_second": 128752.66571948324,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 5,
+          "candidate_id": "ff3d5f5a7eeb",
+          "lease": "lease-0005",
+          "hours": 4.412784115555556,
+          "research_hours": 4.45665199,
+          "nll": 3.070586983103579,
+          "score": 71.63405176166489,
+          "ppl": 21.554551119740093,
+          "seconds_per_task": 0.005104206349187734,
+          "ms": 5.104206349187734,
+          "evaluation_seconds": 10.45341460313648,
+          "tasks_per_second": 195.91684418462756,
+          "input_tokens_per_second": 131545.91606721588,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 6,
+          "candidate_id": "4283d2b22a64",
+          "lease": "lease-0006",
+          "hours": 5.316528137222223,
+          "research_hours": 5.366587822777778,
+          "nll": 3.029124211793015,
+          "score": 72.0170830293949,
+          "ppl": 20.679114132294096,
+          "seconds_per_task": 0.005099856678157266,
+          "ms": 5.099856678157266,
+          "evaluation_seconds": 10.444506476866081,
+          "tasks_per_second": 196.08394178664065,
+          "input_tokens_per_second": 131658.11166336754,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 7,
+          "candidate_id": "a90e0748b6b3",
+          "lease": "lease-0007",
+          "hours": 6.2234843699999995,
+          "research_hours": 6.279726836944445,
+          "nll": 3.0005903650624366,
+          "score": 72.2806774573834,
+          "ppl": 20.0973982233515,
+          "seconds_per_task": 0.005023196350634862,
+          "ms": 5.023196350634862,
+          "evaluation_seconds": 10.287506126100197,
+          "tasks_per_second": 199.07643066224435,
+          "input_tokens_per_second": 133667.3809127807,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 8,
+          "candidate_id": "0e25a05bc6b3",
+          "lease": "lease-0008",
+          "hours": 7.128240450555555,
+          "research_hours": 7.190635310277778,
+          "nll": 2.977362054925696,
+          "score": 72.49525957038931,
+          "ppl": 19.635949706964524,
+          "seconds_per_task": 0.005415361600626056,
+          "ms": 5.415361600626056,
+          "evaluation_seconds": 11.090660558082163,
+          "tasks_per_second": 184.65987569221463,
+          "input_tokens_per_second": 123987.56528509136,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 9,
+          "candidate_id": "76c764267970",
+          "lease": "lease-0009",
+          "hours": 8.001568577777778,
+          "research_hours": 8.070287231388889,
+          "nll": 2.9608073673150512,
+          "score": 72.6481910504123,
+          "ppl": 19.313558598452026,
+          "seconds_per_task": 0.0051048328379010854,
+          "ms": 5.104832837901085,
+          "evaluation_seconds": 10.454697652021423,
+          "tasks_per_second": 195.8928003627171,
+          "input_tokens_per_second": 131529.77214354186,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 10,
+          "candidate_id": "3141bcc7ce32",
+          "lease": "lease-0010",
+          "hours": 8.911891596944445,
+          "research_hours": 8.986859668333333,
+          "nll": 2.9312602234692275,
+          "score": 72.92114627282848,
+          "ppl": 18.75124637366357,
+          "seconds_per_task": 0.0053020091264670555,
+          "ms": 5.3020091264670555,
+          "evaluation_seconds": 10.85851469100453,
+          "tasks_per_second": 188.6077477702006,
+          "input_tokens_per_second": 126638.31464345407,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 11,
+          "candidate_id": "0ce223b87528",
+          "lease": "lease-0011",
+          "hours": 9.821834835277778,
+          "research_hours": 9.903271934444444,
+          "nll": 2.9052824789774854,
+          "score": 73.16112754014195,
+          "ppl": 18.270403928360032,
+          "seconds_per_task": 0.005241267212795719,
+          "ms": 5.241267212795719,
+          "evaluation_seconds": 10.734115251805633,
+          "tasks_per_second": 190.7935541921349,
+          "input_tokens_per_second": 128105.94704288158,
+          "task_count": 2048,
+          "final": false
+        },
+        {
+          "index": 12,
+          "candidate_id": "4eae8dc3718d",
+          "lease": "lease-0012",
+          "hours": 10.569369016666666,
+          "research_hours": 10.657171010555556,
+          "nll": 2.894117040934942,
+          "score": 73.26427336838779,
+          "ppl": 18.067541496757926,
+          "seconds_per_task": 0.005488741457497781,
+          "ms": 5.488741457497781,
+          "evaluation_seconds": 11.240942504955456,
+          "tasks_per_second": 182.1911284660659,
+          "input_tokens_per_second": 122329.95581943412,
+          "task_count": 2048,
+          "final": true
+        }
+      ],
+      "reasoning_tokens": 44988,
+      "output_tokens": 59387,
+      "total_tokens": 11145438,
+      "agent_turns": 116
     }
   ]
 }</script>
-<script type="application/json" id="i18n-data">{"页面语言": "Language", "页面导航": "Navigation", "RSI 分析": "RSI analysis", "最新实验结果": "Latest results", "可视化脚本 ↗": "Visualization scripts ↗", "从实验中学习，模型做得如何？": "How well do models learn from experiments?", "把 RSI 看作 meta-learning：内层训练语言模型，外层根据实验反馈调整方法。一起看最终质量、候选轨迹，以及每次改进花掉的预算。": "View RSI as meta-learning: the inner loop trains a language model, while the outer loop adapts the method using experimental feedback. Explore final quality, candidate trajectories, and the budget spent on improvement.", "实验概况": "Experiment overview", "研究模型": "Research agent models", "已完成实验": "Completed experiments", "Track A / Track B 预算上限": "Track A / Track B budget limits", "相同任务、数据及评估器": "Same task, data, and evaluator", "如何解读：": "How to read this: ", "A 与 B 都允许自我改进，预算规则不同。这里展示观察结果，尚无同预算 RSI-off 对照。ANALYSIS 分数在研究结束后计算，并不是 Agent 当时获得的反馈。": "Both tracks allow self-improvement under different budget rules. These are observational results, with no equal-budget RSI-off control. ANALYSIS scores are computed after research ends; the agent did not receive them as feedback.", "选择比较范围": "Choose what to compare", "选择 Track": "Select a track", "全部模型": "All models", "聚焦主要模型": "Focus on key models", "筛选模型": "Filter models", "点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。": "Click a model to hide or restore it. The chart and tables update together. All models are shown by default.", "自定义比较图": "Customize the chart", "横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。": "Choose Score, NLL, PPL, inference latency, throughput, budget, and other metrics for either axis. Hover near a point for details.", "常用指标组合": "Common metric pairs", "Score × 时间": "Score × time", "NLL × 时间": "NLL × time", "数据范围": "Data view", "图表数据范围": "Chart data view", "候选 · ANALYSIS": "Candidates · ANALYSIS", "最终 · TEST": "Final · TEST", "横轴": "X axis", "横轴指标": "X-axis metric", "横轴刻度": "X-axis scale", "线性": "Linear", "对数": "Log", "交换横纵轴": "Swap axes", "纵轴": "Y axis", "纵轴指标": "Y-axis metric", "纵轴刻度": "Y-axis scale", "按所选横纵轴比较模型": "Compare models using the selected axes", "悬停、点击或键盘聚焦数据点，查看模型和精确数值。": "Hover, tap, or focus a point with the keyboard to see the model and exact values.", "Track B · 最终结果": "Track B · Final results", "Track {track} · 最终结果": "Track {track} · Final results", "按 NLL 升序排列；提交候选数与元学习次数不同。": "Sorted by increasing NLL. Candidate count is not the number of meta-learning steps.", "下载汇总 JSON": "Download summary JSON", "模型": "Model", "租约小时": "Lease hours", "候选数": "Candidates", "ANALYSIS 首 → 末": "ANALYSIS first → final", "s/task 为每条任务的推理秒数（1 s = 1000 ms）。Score 与 NLL 来自同一个质量指标。租约小时包含运行环境内的全部占用，不等于纯 GPU 计算时间。": "s/task is inference seconds per task (1 s = 1000 ms). Score and NLL express the same quality metric. Lease hours include all time occupying the training environment, not just GPU computation.", "同一模型在两种预算下的结果": "The same model under two budget rules", "这是一组描述性配对，不合并成同一预算下的排名。": "These pairs describe outcomes under different budgets; they are not a single equal-budget ranking.", "较低 NLL": "Lower NLL", "负值表示本次 B 的 NLL 更低。结果同时受初始配方、实际训练量、推理配置和随机性影响，差值不等于 RSI 增益。": "A negative difference means Track B achieved lower NLL in this run. Initial recipes, actual training, agent inference settings, and randomness also affect the outcome. The difference is not an RSI effect estimate.", "三个值得保留的判断": "Three findings to keep in mind", "01 / 方法改进": "01 / Improving the method", "Fable / Opus：完整的反馈闭环": "Fable / Opus: a complete feedback loop", "A 组都通过测量瓶颈，把训练吞吐提升到约 2.1 倍。Opus 还调整不稳定的训练策略，并放弃实测无收益的权重平均。B 组两者只差 0.00031 NLL，单次实验不足以区分优劣。": "In Track A, both identified bottlenecks and raised training throughput to about 2.1× its initial level. Opus also corrected an unstable training strategy and rejected weight averaging after measuring no benefit. Their Track B NLL differs by only 0.00031; a single run cannot establish a winner.", "02 / 诊断与取舍": "02 / Diagnosis and tradeoffs", "Astra / Kimi：不同的适应能力": "Astra / Kimi: different strengths in adaptation", "Astra 比较上下文长度与校准方案，在 B 组获得最低的推理耗时点估计。Kimi 在更换验证样本后，把旧、新候选放到相同样本上重测，避免把测量变化误判为进步。": "Astra compared context lengths and calibration choices, achieving the lowest observed inference latency in Track B. After changing its validation sample, Kimi re-evaluated both candidates on the same examples to distinguish model improvement from a change in measurement.", "03 / 归因边界": "03 / Limits of attribution", "首末涨幅需要结合起点": "Interpret improvement in light of its starting point", "早期保险候选、错误修复、更多梯度训练和方法更新，都可能拉大首末差值。Flash B 到第 5 租约才提交首候选，不能与从第 1 租约开始提交的曲线直接比较涨幅。": "Early fallback candidates, bug fixes, additional gradient training, and method changes can all increase the first-to-final difference. Flash B first submitted a candidate in lease 5, so its improvement is not directly comparable to a trajectory starting in lease 1.", "其余模型的过程证据": "Process evidence for the other models", "DeepSeek Flash：B 的高吞吐配方与持续训练获得优秀终点；A 的退火与低学习率续训也改善了自评与候选结果。": "DeepSeek Flash: a high-throughput recipe and continued training produced a strong Track B result. In A, cooldown and low-learning-rate continuation improved local validation and candidate results.", "GLM：通过 profiling、CUDA graphs 与位置表示调整提高吞吐；实现收益没有全部转化成最优质量。": "GLM: profiling, CUDA graphs, and changes to positional representations improved throughput. These implementation gains did not fully translate into leading model quality.", "Sonnet：B 修复逐元素输出检查瓶颈，本地 1000 样本耗时约 25 s → 3.4 s；A 的自评未充分覆盖最终表现。": "Sonnet: fixing per-element output validation in B reduced local runtime for 1,000 examples from about 25 s to 3.4 s. Local validation in A did not adequately capture final performance.", "Sol：B 候选稳定改善，主要沿相同配方续训；方法层改进的独立贡献尚未识别。": "Sol: B candidates improved steadily, mainly through continued training with the same recipe. The independent contribution of method changes has not been isolated.", "DeepSeek Pro：两轨初始配方、搜索成本和最终结果差异较大。": "DeepSeek Pro: initial recipes, search costs, and final outcomes differed substantially between tracks.", "Terra / Luna：错误修复、验证覆盖和预算分配仍限制结果；大幅下降不能自动归因于更强元学习。": "Terra / Luna: bug recovery, validation coverage, and budget allocation still limit results. A large loss reduction does not by itself establish stronger meta-learning.", "数据口径与复现": "Data definitions and reproducibility", "每个模型／Track 采用最新授权尝试。GLM B 与 Flash A 的旧失败尝试单独排除。": "Each model/track uses its latest authorized attempt. Earlier failed GLM B and Flash A attempts are excluded separately.", "本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。": "These are host_cli preview runs, not official leaderboard entries. Each configuration has one run; variation across training seeds has not been estimated.", "A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。": "A limits research wall-clock time; B limits training-environment leases. Some batches use different output limits and other agent inference settings.", "页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。": "The page publishes model results, candidate trajectories, and aggregate metrics. It is a snapshot that updates when rebuilt.", "查看数据身份": "View data provenance", "构建脚本": "Build script", "页面模板": "Page template", "数据快照：{time} · lm-pretrain · 单卡 H200": "Snapshot: {time} · lm-pretrain · single H200", "Core: {revision} · 源快照 SHA256: {hash}": "Core: {revision} · Source snapshot SHA256: {hash}", "困惑度 PPL ↓": "Perplexity PPL ↓", "推理耗时 / ms per task ↓": "Inference latency / ms per task ↓", "评估总耗时 / s ↓": "Total evaluation time / s ↓", "推理吞吐 / tasks per s ↑": "Inference throughput / tasks per s ↑", "输入吞吐 / tokens per s ↑": "Input throughput / tokens per s ↑", "累计租约时间 / h": "Cumulative lease time / h", "提交时研究用时 / h": "Research time at submission / h", "候选提交序号": "Candidate submission number", "来源租约序号": "Source lease number", "较首候选 Score 提升 ↑": "Score gain since first candidate ↑", "较首候选 NLL 下降 ↑": "NLL decrease since first candidate ↑", "总租约时间 / h": "Total lease time / h", "研究用时 / h": "Research time / h", "提交候选数": "Candidate count", "使用租约数": "Leases used", "Agent 推理 tokens": "Agent reasoning tokens", "Agent 输出 tokens": "Agent output tokens", "Agent 总 tokens（含缓存）": "Agent total tokens (incl. cache)", "Agent 对话轮数": "Agent turns", "首候选 ANALYSIS NLL ↓": "First-candidate ANALYSIS NLL ↓", "最终候选 ANALYSIS NLL ↓": "Final-candidate ANALYSIS NLL ↓", "首末 ANALYSIS NLL 下降 ↑": "First-to-final ANALYSIS NLL decrease ↑", "未记录": "Not recorded", "困惑度 PPL": "Perplexity PPL", "推理耗时 · s/task": "Inference latency · s/task", "评估总耗时 · s": "Evaluation time · s", "推理吞吐 · tasks/s": "Inference throughput · tasks/s", "租约累计 · h": "Cumulative lease time · h", "研究用时 · h": "Research time · h", "较首候选 Score 提升": "Score gain since first candidate", "输入吞吐 · tokens/s": "Input throughput · tokens/s", "提交候选 / 使用租约": "Candidates / leases used", "候选 #{index}": "Candidate #{index}", "最终选定": "Final selection", "最终选定结果": "Final selected result", "研究墙钟上限": "research wall-clock limit", "租约总上限": "total lease budget", "候选 ID": "Candidate ID", "样本数": "Examples", "ANALYSIS 为研究结束后评估。": "ANALYSIS is evaluated after research ends. ", "TEST 仅评估最终候选。": "TEST evaluates only the final candidate. ", "PPL = exp(NLL)。": "PPL = exp(NLL).", "{axis}含零或负值，使用线性刻度": "{axis} contains zero or negative values; using a linear scale", "每个点是一份已提交候选，Score / NLL / 耗时均来自该候选的 ANALYSIS 评估。": "Each point is a submitted candidate. Its Score, NLL, and latency come from that candidate's ANALYSIS evaluation.", "同色连线按提交顺序连接，不表示中间训练轨迹。": "Lines of the same color connect submissions in order; they do not show intervening training.", "当前组合显示散点；选择时间或序号指标可查看连线。": "This metric pair uses scatter points. Choose a time or sequence metric to connect submissions.", "租约时间包含测量、训练和打包。": "Lease time includes measurement, training, and packaging.", "每个点是一个模型的最终 TEST 结果。Score / NLL / 耗时均来自 TEST；首末 ANALYSIS 下降单独标注。观察差值不等于 RSI 因果增益。": "Each point is a model's final TEST result. Score, NLL, and latency come from TEST; first-to-final ANALYSIS improvement is labeled separately. Observed differences are not causal RSI effect estimates.", "候选过程": "candidate history", "最终结果": "final results", "Track {track} · {view}；横轴 {x}；纵轴 {y}": "Track {track} · {view}; X axis {x}; Y axis {y}", "当前指标没有可用数据": "No data available for these metrics", "请选择至少一个模型": "Select at least one model", "提交 {index}": "Submission {index}", "最终候选": "Final candidate", "最多 8 小时研究墙钟；可多次实验和开租约。": "Up to 8 hours of research wall-clock time; multiple experiments and leases are allowed.", "最多 6 个训练租约，每次最多 1 小时。": "Up to 6 training leases, each lasting at most 1 hour.", "请选择模型。": "Select a model.", "未完成": "Incomplete", "相同": "Equal"}</script>
+<script type="application/json" id="i18n-data">{"页面语言": "Language", "页面导航": "Navigation", "RSI 分析": "RSI analysis", "最新实验结果": "Latest results", "可视化脚本 ↗": "Visualization scripts ↗", "从实验中学习，模型做得如何？": "How well do models learn from experiments?", "把 RSI 看作 meta-learning：内层训练语言模型，外层根据实验反馈调整方法。一起看最终质量、候选轨迹，以及每次改进花掉的预算。": "View RSI as meta-learning: the inner loop trains a language model, while the outer loop adapts the method using experimental feedback. Explore final quality, candidate trajectories, and the budget spent on improvement.", "实验概况": "Experiment overview", "研究模型": "Research agent models", "已完成实验": "Completed experiments", "Track A / Track B 预算上限": "Track A / Track B budget limits", "相同任务、数据及评估器": "Same task, data, and evaluator", "如何解读：": "How to read this: ", "A 与 B 都允许自我改进，预算规则不同。这里展示观察结果，尚无同预算 RSI-off 对照。ANALYSIS 分数在研究结束后计算，并不是 Agent 当时获得的反馈。": "Both tracks allow self-improvement under different budget rules. These are observational results, with no equal-budget RSI-off control. ANALYSIS scores are computed after research ends; the agent did not receive them as feedback.", "选择比较范围": "Choose what to compare", "选择 Track": "Select a track", "全部模型": "All models", "聚焦主要模型": "Focus on key models", "筛选模型": "Filter models", "点击模型名称可隐藏或恢复；图表和结果表会同步更新。默认显示全部模型。": "Click a model to hide or restore it. The chart and tables update together. All models are shown by default.", "自定义比较图": "Customize the chart", "横纵轴可选 Score、NLL、PPL、推理耗时、吞吐、预算等指标。悬停点附近即可查看详细信息。": "Choose Score, NLL, PPL, inference latency, throughput, budget, and other metrics for either axis. Hover near a point for details.", "常用指标组合": "Common metric pairs", "Score × 时间": "Score × time", "NLL × 时间": "NLL × time", "数据范围": "Data view", "图表数据范围": "Chart data view", "候选 · ANALYSIS": "Candidates · ANALYSIS", "最终 · TEST": "Final · TEST", "横轴": "X axis", "横轴指标": "X-axis metric", "横轴刻度": "X-axis scale", "线性": "Linear", "对数": "Log", "交换横纵轴": "Swap axes", "纵轴": "Y axis", "纵轴指标": "Y-axis metric", "纵轴刻度": "Y-axis scale", "按所选横纵轴比较模型": "Compare models using the selected axes", "悬停、点击或键盘聚焦数据点，查看模型和精确数值。": "Hover, tap, or focus a point with the keyboard to see the model and exact values.", "Track B · 最终结果": "Track B · Final results", "Track {track} · 最终结果": "Track {track} · Final results", "按 NLL 升序排列；提交候选数与元学习次数不同。": "Sorted by increasing NLL. Candidate count is not the number of meta-learning steps.", "下载汇总 JSON": "Download summary JSON", "模型": "Model", "租约小时": "Lease hours", "候选数": "Candidates", "ANALYSIS 首 → 末": "ANALYSIS first → final", "s/task 为每条任务的推理秒数（1 s = 1000 ms）。Score 与 NLL 来自同一个质量指标。租约小时包含运行环境内的全部占用，不等于纯 GPU 计算时间。": "s/task is inference seconds per task (1 s = 1000 ms). Score and NLL express the same quality metric. Lease hours include all time occupying the training environment, not just GPU computation.", "同一模型在两种预算下的结果": "The same model under two budget rules", "这是一组描述性配对，不合并成同一预算下的排名。": "These pairs describe outcomes under different budgets; they are not a single equal-budget ranking.", "较低 NLL": "Lower NLL", "负值表示本次 B 的 NLL 更低。结果同时受初始配方、实际训练量、推理配置和随机性影响，差值不等于 RSI 增益。": "A negative difference means Track B achieved lower NLL in this run. Initial recipes, actual training, agent inference settings, and randomness also affect the outcome. The difference is not an RSI effect estimate.", "三个值得保留的判断": "Three findings to keep in mind", "01 / 方法改进": "01 / Improving the method", "Fable / Opus：完整的反馈闭环": "Fable / Opus: a complete feedback loop", "A 组都通过测量瓶颈，把训练吞吐提升到约 2.1 倍。Opus 还调整不稳定的训练策略，并放弃实测无收益的权重平均。B 组两者只差 0.00031 NLL，单次实验不足以区分优劣。": "In Track A, both identified bottlenecks and raised training throughput to about 2.1× its initial level. Opus also corrected an unstable training strategy and rejected weight averaging after measuring no benefit. Their Track B NLL differs by only 0.00031; a single run cannot establish a winner.", "02 / 诊断与取舍": "02 / Diagnosis and tradeoffs", "Astra / Kimi：不同的适应能力": "Astra / Kimi: different strengths in adaptation", "Astra 比较上下文长度与校准方案，在 B 组获得最低的推理耗时点估计。Kimi 在更换验证样本后，把旧、新候选放到相同样本上重测，避免把测量变化误判为进步。": "Astra compared context lengths and calibration choices, achieving the lowest observed inference latency in Track B. After changing its validation sample, Kimi re-evaluated both candidates on the same examples to distinguish model improvement from a change in measurement.", "03 / 归因边界": "03 / Limits of attribution", "首末涨幅需要结合起点": "Interpret improvement in light of its starting point", "早期保险候选、错误修复、更多梯度训练和方法更新，都可能拉大首末差值。Flash B 到第 5 租约才提交首候选，不能与从第 1 租约开始提交的曲线直接比较涨幅。": "Early fallback candidates, bug fixes, additional gradient training, and method changes can all increase the first-to-final difference. Flash B first submitted a candidate in lease 5, so its improvement is not directly comparable to a trajectory starting in lease 1.", "其余模型的过程证据": "Process evidence for the other models", "DeepSeek Flash：B 的高吞吐配方与持续训练获得优秀终点；A 的退火与低学习率续训也改善了自评与候选结果。": "DeepSeek Flash: a high-throughput recipe and continued training produced a strong Track B result. In A, cooldown and low-learning-rate continuation improved local validation and candidate results.", "GLM：通过 profiling、CUDA graphs 与位置表示调整提高吞吐；实现收益没有全部转化成最优质量。": "GLM: profiling, CUDA graphs, and changes to positional representations improved throughput. These implementation gains did not fully translate into leading model quality.", "Sonnet：B 修复逐元素输出检查瓶颈，本地 1000 样本耗时约 25 s → 3.4 s；A 的自评未充分覆盖最终表现。": "Sonnet: fixing per-element output validation in B reduced local runtime for 1,000 examples from about 25 s to 3.4 s. Local validation in A did not adequately capture final performance.", "Sol：B 候选稳定改善，主要沿相同配方续训；方法层改进的独立贡献尚未识别。": "Sol: B candidates improved steadily, mainly through continued training with the same recipe. The independent contribution of method changes has not been isolated.", "DeepSeek Pro：两轨初始配方、搜索成本和最终结果差异较大。": "DeepSeek Pro: initial recipes, search costs, and final outcomes differed substantially between tracks.", "Terra / Luna：错误修复、验证覆盖和预算分配仍限制结果；大幅下降不能自动归因于更强元学习。": "Terra / Luna: bug recovery, validation coverage, and budget allocation still limit results. A large loss reduction does not by itself establish stronger meta-learning.", "数据口径与复现": "Data definitions and reproducibility", "每个模型／Track 采用最新授权尝试。GLM B 与 Flash A 的旧失败尝试单独排除。": "Each model/track uses its latest authorized attempt. Earlier failed GLM B and Flash A attempts are excluded separately.", "本批为 host_cli preview，不属于正式 leaderboard；每种配置只有一次运行，未估计训练种子方差。": "These are host_cli preview runs, not official leaderboard entries. Each configuration has one run; variation across training seeds has not been estimated.", "A 是研究墙钟上限；B 是训练环境租约上限。部分批次的输出上限等推理配置有差异。": "A limits research wall-clock time; B limits training-environment leases. Some batches use different output limits and other agent inference settings.", "页面公开模型结果、候选轨迹与汇总指标。该页为一次结果快照，重新构建后更新。": "The page publishes model results, candidate trajectories, and aggregate metrics. It is a snapshot that updates when rebuilt.", "查看数据身份": "View data provenance", "构建脚本": "Build script", "页面模板": "Page template", "数据快照：{time} · lm-pretrain · 单卡 H200": "Snapshot: {time} · lm-pretrain · single H200", "Core: {revision} · 源快照 SHA256: {hash}": "Core: {revision} · Source snapshot SHA256: {hash}", "困惑度 PPL ↓": "Perplexity PPL ↓", "推理耗时 / ms per task ↓": "Inference latency / ms per task ↓", "评估总耗时 / s ↓": "Total evaluation time / s ↓", "推理吞吐 / tasks per s ↑": "Inference throughput / tasks per s ↑", "输入吞吐 / tokens per s ↑": "Input throughput / tokens per s ↑", "累计租约时间 / h": "Cumulative lease time / h", "提交时研究用时 / h": "Research time at submission / h", "候选提交序号": "Candidate submission number", "来源租约序号": "Source lease number", "较首候选 Score 提升 ↑": "Score gain since first candidate ↑", "较首候选 NLL 下降 ↑": "NLL decrease since first candidate ↑", "总租约时间 / h": "Total lease time / h", "研究用时 / h": "Research time / h", "提交候选数": "Candidate count", "使用租约数": "Leases used", "Agent 推理 tokens": "Agent reasoning tokens", "Agent 输出 tokens": "Agent output tokens", "Agent 总 tokens（含缓存）": "Agent total tokens (incl. cache)", "Agent 对话轮数": "Agent turns", "首候选 ANALYSIS NLL ↓": "First-candidate ANALYSIS NLL ↓", "最终候选 ANALYSIS NLL ↓": "Final-candidate ANALYSIS NLL ↓", "首末 ANALYSIS NLL 下降 ↑": "First-to-final ANALYSIS NLL decrease ↑", "未记录": "Not recorded", "困惑度 PPL": "Perplexity PPL", "推理耗时 · s/task": "Inference latency · s/task", "评估总耗时 · s": "Evaluation time · s", "推理吞吐 · tasks/s": "Inference throughput · tasks/s", "租约累计 · h": "Cumulative lease time · h", "研究用时 · h": "Research time · h", "较首候选 Score 提升": "Score gain since first candidate", "输入吞吐 · tokens/s": "Input throughput · tokens/s", "提交候选 / 使用租约": "Candidates / leases used", "候选 #{index}": "Candidate #{index}", "最终选定": "Final selection", "最终选定结果": "Final selected result", "研究墙钟上限": "research wall-clock limit", "租约总上限": "total lease budget", "候选 ID": "Candidate ID", "样本数": "Examples", "ANALYSIS 为研究结束后评估。": "ANALYSIS is evaluated after research ends. ", "TEST 仅评估最终候选。": "TEST evaluates only the final candidate. ", "PPL = exp(NLL)。": "PPL = exp(NLL).", "{axis}含零或负值，使用线性刻度": "{axis} contains zero or negative values; using a linear scale", "每个点是一份已提交候选，Score / NLL / 耗时均来自该候选的 ANALYSIS 评估。": "Each point is a submitted candidate. Its Score, NLL, and latency come from that candidate's ANALYSIS evaluation.", "同色连线按提交顺序连接，不表示中间训练轨迹。": "Lines of the same color connect submissions in order; they do not show intervening training.", "当前组合显示散点；选择时间或序号指标可查看连线。": "This metric pair uses scatter points. Choose a time or sequence metric to connect submissions.", "租约时间包含测量、训练和打包。": "Lease time includes measurement, training, and packaging.", "每个点是一个模型的最终 TEST 结果。Score / NLL / 耗时均来自 TEST；首末 ANALYSIS 下降单独标注。观察差值不等于 RSI 因果增益。": "Each point is a model's final TEST result. Score, NLL, and latency come from TEST; first-to-final ANALYSIS improvement is labeled separately. Observed differences are not causal RSI effect estimates.", "候选过程": "candidate history", "最终结果": "final results", "Track {track} · {view}；横轴 {x}；纵轴 {y}": "Track {track} · {view}; X axis {x}; Y axis {y}", "当前指标没有可用数据": "No data available for these metrics", "请选择至少一个模型": "Select at least one model", "提交 {index}": "Submission {index}", "最终候选": "Final candidate", "最多 8 小时研究墙钟；可多次实验和开租约。": "Up to 8 hours of research wall-clock time; multiple experiments and leases are allowed.", "最多 6 个训练租约，每次最多 1 小时。": "Up to 6 training leases, each lasting at most 1 hour.", "请选择模型。": "Select a model.", "未完成": "Incomplete", "相同": "Equal", "最多 12 个训练租约，每次最多 1 小时；本批仅 Fable、Astra。": "Up to 12 training leases of one hour each; Fable and Astra only in this batch.", "B6 → B12：增加租约后的结果": "B6 → B12: results with more leases", "独立新运行，每种配置一次；差值包含训练量、策略与随机性变化，不是纯预算因果效应。": "Fresh independent runs, one per configuration. Differences include training volume, strategy, and randomness; they do not isolate a causal budget effect.", "B12 · 租约小时": "B12 · Lease hours", "第 6 → 12 次提交的 ANALYSIS：Fable 3.0291 → 2.8941；Astra 3.1706 → 3.0084。后六次仍有改善，是否来自方法创新需结合过程证据。": "ANALYSIS from submissions 6 → 12: Fable 3.0291 → 2.8941; Astra 3.1706 → 3.0084. Both improved in the second half; attributing gains to method innovation requires process evidence.", "同一模型：A8 与 B6": "Same model: A8 versus B6", "每个模型／Track 配置采用最新授权尝试。A8、B6、B12 分开保留；新增 B12 仅覆盖 Fable 与 Astra。GLM B6 与 Flash A 的旧失败尝试单独排除。": "The latest authorized attempt is retained per model and Track configuration. A8, B6, and B12 remain separate; B12 covers Fable and Astra only. Earlier failed GLM B6 and Flash A attempts are excluded separately.", "A 组通过测量瓶颈改善吞吐，最终加速也包含模型配置变化。Opus 还调整不稳定的训练策略，并放弃实测无收益的权重平均。B6 组两者只差 0.00031 NLL，单次实验不足以区分优劣。": "Both improved Track A throughput by measuring bottlenecks; final speedups also include model configuration changes. Opus corrected unstable training and rejected unhelpful weight averaging. Their B6 results differ by just 0.00031 NLL, too little to distinguish them from single runs.", "Astra 比较上下文长度与校准方案，在 B6 组获得最低的推理耗时点估计。Kimi 在更换验证样本后，把旧、新候选放到相同样本上重测，避免把测量变化误判为进步。": "Astra compared context lengths and calibration choices, achieving the lowest observed inference latency in Track B6. After changing its validation sample, Kimi re-evaluated both candidates on the same examples to distinguish model improvement from a change in measurement."}</script>
 <script>
 'use strict';
 const D=JSON.parse(document.getElementById('rsi-data').textContent), $=s=>document.querySelector(s);
@@ -1680,7 +2363,8 @@ document.querySelectorAll('[data-lang]').forEach(button=>button.addEventListener
 }));
 const defs={
 'claude-fable-5-1':['Fable 5.1','#a43d75'],'claude-opus-5':['Opus 5','#d98030'],'gpt-6-astra':['Astra','#287dc1'],'kimi-k3':['Kimi K3','#1c9681'],'deepseek-v4-flash':['DeepSeek Flash','#9268c0'],'glm-5.3':['GLM 5.3','#73853d'],'claude-sonnet-5':['Sonnet 5','#c45749'],'gpt-5.6-sol':['Sol','#4e97b3'],'deepseek-v4-pro':['DeepSeek Pro','#5c549e'],'gpt-5.6-terra':['Terra','#67718a'],'gpt-5.6-luna':['Luna','#a17d4f']};
-const models=Object.keys(defs).filter(m=>D.rows.some(r=>r.model===m)), visible=new Set(models);let track='B';
+const models=Object.keys(defs).filter(m=>D.rows.some(r=>r.model===m)), visible=new Set(models);let track=D.rows.some(r=>r.max_leases===12)?'B12':'B6';
+const lane=r=>r.track==='A'?'A':(r.max_leases===12||r.track_config==='preview-b-12x1h'?'B12':'B6');
 const fmt=(n,d=4)=>n==null?'—':Number(n).toFixed(d), esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 $('#model-count').textContent=models.length;$('#complete-count').textContent=`${D.rows.filter(r=>r.test_nll!=null).length} / ${D.rows.length}`;
 models.forEach(m=>{const b=document.createElement('button');b.className='chip';b.setAttribute('aria-pressed','true');b.innerHTML=`<span class="dot" style="background:${defs[m][1]}"></span>${esc(defs[m][0])}`;b.dataset.model=m;b.addEventListener('click',()=>{visible.has(m)?visible.delete(m):visible.add(m);render()});$('#legend').append(b)});
@@ -1771,8 +2455,8 @@ function showTooltip(point,event){
   const budget=`${pretty(r.budget_hours,0)} h ${t(r.track==='A'?'研究墙钟上限':'租约总上限')}`;
   const choice=axisChoices[$('#plot-view').value],set=metricSets[$('#plot-view').value];
   const axes=`${t('横轴')} ${esc(t(set[choice.x].label))}: ${pretty(point.x,set[choice.x].integer?0:6)}<br>${t('纵轴')} ${esc(t(set[choice.y].label))}: ${pretty(point.y,set[choice.y].integer?0:6)}`;
-  tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${r.track}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>${t('候选 ID')} ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(t(label))}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>${t('样本数')} ${pretty(v.task_count,0)} · ${esc(budget)}<br>${t(c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。')}${t('PPL = exp(NLL)。')}</div>`;
-  $('#point-detail').textContent=`${defs[r.model][0]} · Track ${r.track} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.seconds_per_task,6)} s/task (${pretty(v.ms,4)} ms/task)`;
+  tooltip.innerHTML=`<div class="tooltip-title"><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])} · Track ${lane(r)}</div><div class="tooltip-subtitle">${esc(stage)} · ${source}${c?`<br>${t('候选 ID')} ${esc(c.candidate_id)}`:''}</div><dl class="tooltip-metrics">${entries.map(([label,value,cls])=>`<div class="${cls||''}"><dt>${esc(t(label))}</dt><dd>${esc(value)}</dd></div>`).join('')}</dl><div class="tooltip-footer">${axes}<br>${t('样本数')} ${pretty(v.task_count,0)} · ${esc(budget)}<br>${t(c?'ANALYSIS 为研究结束后评估。':'TEST 仅评估最终候选。')}${t('PPL = exp(NLL)。')}</div>`;
+  $('#point-detail').textContent=`${defs[r.model][0]} · Track ${lane(r)} · ${stage} · ${source} Score ${pretty(v.score,4)} · NLL ${pretty(c?c.nll:r.test_nll,6)} · ${pretty(v.seconds_per_task,6)} s/task (${pretty(v.ms,4)} ms/task)`;
  }
  tooltip.hidden=false;
  const anchor=point.circle.getBoundingClientRect(),x=event?.clientX??(anchor.left+anchor.width/2),y=event?.clientY??(anchor.top+anchor.height/2);
@@ -1859,7 +2543,7 @@ function drawPlot(rows){
  });
  points.forEach(p=>{
   const r=p.row,stage=p.candidate?` · ${t('提交 {index}',{index:p.candidate.index})}${p.candidate.final?' · '+t('最终候选'):''}`:' · '+t('最终结果');
-  const label=`${defs[r.model][0]} · Track ${r.track}${stage} ｜ ${xm.label}：${fmt(p.x,xm.integer?0:6)} ｜ ${ym.label}：${fmt(p.y,ym.integer?0:6)}`;
+  const label=`${defs[r.model][0]} · Track ${lane(r)}${stage} ｜ ${xm.label}：${fmt(p.x,xm.integer?0:6)} ｜ ${ym.label}：${fmt(p.y,ym.integer?0:6)}`;
   const circle=el(svg,'circle',{cx:sx(p.x),cy:sy(p.y),r:!p.candidate||p.candidate.final?6:4.8,fill:defs[r.model][1],stroke:'white','stroke-width':1.5,tabindex:0,class:'chart-point','aria-label':label,'data-model-id':r.model,'data-x':p.x,'data-y':p.y});
   p.circle=circle;p.cx=sx(p.x);p.cy=sy(p.y);plottedPoints.push(p);
   circle.setAttribute('aria-describedby','point-detail');
@@ -1868,14 +2552,19 @@ function drawPlot(rows){
  });
 }
 function render(){
+ $('#budget-pairs').innerHTML=models.filter(m=>visible.has(m)&&D.rows.some(r=>r.model===m&&lane(r)==='B12')).map(m=>{
+ const b6=D.rows.find(r=>r.model===m&&lane(r)==='B6'),b12=D.rows.find(r=>r.model===m&&lane(r)==='B12');
+ const diff=b6?.test_nll!=null&&b12?.test_nll!=null?b12.test_nll-b6.test_nll:null;
+ return `<tr><td>${esc(defs[m][0])}</td><td>${fmt(b6?.test_nll)}</td><td>${fmt(b12?.test_nll)}</td><td>${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${fmt(b12?.seconds_per_task,6)}</td><td>${fmt(b12?.lease_hours,2)}</td></tr>`;
+ }).join('')||`<tr><td colspan="6">${t('请选择模型。')}</td></tr>`;
  document.querySelectorAll('[data-track]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.track===track)));
  document.querySelectorAll('[data-model]').forEach(b=>b.setAttribute('aria-pressed',String(visible.has(b.dataset.model))));
- $('#track-desc').textContent=t(track==='A'?'最多 8 小时研究墙钟；可多次实验和开租约。':'最多 6 个训练租约，每次最多 1 小时。');
+ $('#track-desc').textContent=t(track==='A'?'最多 8 小时研究墙钟；可多次实验和开租约。':track==='B12'?'最多 12 个训练租约，每次最多 1 小时；本批仅 Fable、Astra。':'最多 6 个训练租约，每次最多 1 小时。');
  $('#table-title').textContent=t('Track {track} · 最终结果',{track});
- const rows=D.rows.filter(r=>r.track===track&&visible.has(r.model)).sort((a,b)=>(a.test_nll??Infinity)-(b.test_nll??Infinity));
+ const rows=D.rows.filter(r=>lane(r)===track&&visible.has(r.model)).sort((a,b)=>(a.test_nll??Infinity)-(b.test_nll??Infinity));
  drawPlot(rows);
  $('#results').innerHTML=rows.length?rows.map(r=>`<tr><td><span style="color:${defs[r.model][1]}">●</span> ${esc(defs[r.model][0])}</td><td class="num">${fmt(r.test_nll)}</td><td class="num">${fmt(r.score,2)}</td><td class="num">${fmt(r.seconds_per_task,6)}</td><td class="num">${fmt(r.lease_hours,2)}</td><td>${r.candidates}</td><td class="num">${fmt(r.first_analysis,3)} → ${fmt(r.final_analysis,3)}</td></tr>`).join(''):`<tr><td colspan="7">${t('请选择模型。')}</td></tr>`;
- $('#pairs').innerHTML=models.filter(m=>visible.has(m)).map(m=>{const a=D.rows.find(r=>r.model===m&&r.track==='A'),b=D.rows.find(r=>r.model===m&&r.track==='B'),diff=a?.test_nll!=null&&b?.test_nll!=null?b.test_nll-a.test_nll:null;return `<tr><td>${esc(defs[m][0])}</td><td class="num">${fmt(a?.test_nll)}</td><td class="num">${fmt(b?.test_nll)}</td><td class="num" style="color:${diff<0?'var(--green)':'var(--orange)'}">${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${diff==null?t('未完成'):diff<0?'B':diff>0?'A':t('相同')}</td></tr>`}).join('')||`<tr><td colspan="5">${t('请选择模型。')}</td></tr>`;
+ $('#pairs').innerHTML=models.filter(m=>visible.has(m)).map(m=>{const a=D.rows.find(r=>r.model===m&&r.track==='A'),b=D.rows.find(r=>r.model===m&&lane(r)==='B6'),diff=a?.test_nll!=null&&b?.test_nll!=null?b.test_nll-a.test_nll:null;return `<tr><td>${esc(defs[m][0])}</td><td class="num">${fmt(a?.test_nll)}</td><td class="num">${fmt(b?.test_nll)}</td><td class="num" style="color:${diff<0?'var(--green)':'var(--orange)'}">${diff==null?'—':(diff>0?'+':'')+fmt(diff)}</td><td>${diff==null?t('未完成'):diff<0?'B':diff>0?'A':t('相同')}</td></tr>`}).join('')||`<tr><td colspan="5">${t('请选择模型。')}</td></tr>`;
 }
 applyLanguage();
 fillAxes();
